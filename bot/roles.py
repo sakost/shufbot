@@ -41,7 +41,7 @@ def restrict_access(level, global_=False):
             else:
                 user, created = await mgr.get_or_create(ChatUser, id=user_id)
 
-            if is_owner(user_id, ctx.config):
+            if global_ and is_owner(user_id, ctx.config):
                 if user.role != Roles.OWNER.value:
                     user.role = Roles.OWNER.value
                     await mgr.update(user)
