@@ -1,3 +1,4 @@
 kutana
 python-dotenv
 psutil
+aioping
