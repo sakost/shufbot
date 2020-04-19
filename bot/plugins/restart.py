@@ -26,12 +26,12 @@ async def _(app):
 
 @plugin.on_commands(['рестарт', 'restart'])
 @developer_global_role
-async def _(msg, ctx: Context):
+async def restart_command(msg, ctx: Context):
     await ctx.reply('Перезагружаюсь...')
     os.execl(sys.executable,
              sys.executable,
              sys.argv[0],
              "--restarted",
              str(time.time()),
-             str(ctx.update.receiver_id),
-             str(msg.raw['object']['message']['from_id']))
+             str(msg.receiver_id),
+             str(msg.sender_id))

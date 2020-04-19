@@ -33,7 +33,7 @@ def restrict_access(level, global_=False):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             msg, ctx, *_ = args
-            user_id = msg.raw['object']['message']['from_id']
+            user_id = msg.sender_id
 
             if is_owner(user_id, ctx.config):
                 return await func(*args, **kwargs)
