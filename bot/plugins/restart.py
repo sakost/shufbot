@@ -27,6 +27,10 @@ async def _(app):
 @admin_role
 async def _(msg, ctx: Context):
     await ctx.reply('Перезагружаюсь...')
-    os.execl(sys.executable, sys.executable,
-             sys.argv[0], "--restarted", str(int(time.time())), ctx.user_uid[:-len(ctx.backend.get_identity())],
+    os.execl(sys.executable,
+             sys.executable,
+             sys.argv[0],
+             "--restarted",
+             str(int(time.time())),
+             ctx.user_uid[:-len(ctx.backend.get_identity())],
              str(msg.raw['object']['message']['from_id']))
