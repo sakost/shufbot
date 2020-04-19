@@ -1,7 +1,7 @@
 from kutana import Plugin, Context, Message
 
 
-plugin = Plugin(name='Echo', description='Напиши мне кто ты и я скажу кто ты')
+plugin = Plugin(name='Ae', description='Напиши мне кто ты и я скажу кто ты')
 
 
 @plugin.on_commands(['ае', 'ae'])
