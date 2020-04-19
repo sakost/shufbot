@@ -4,7 +4,7 @@ import time
 
 from kutana import Plugin, Context
 
-from bot.roles import admin_role
+from bot.roles import developer_global_role
 
 plugin = Plugin('Manage process', '(re)start bot')
 
@@ -14,7 +14,7 @@ async def _(app):
     if len(sys.argv) == 5 and sys.argv[1] == '--restarted':
         for backend in app.get_backends():
             if backend.get_identity() == 'vkontakte':
-                elapsed_time = time.time() - int(sys.argv[2])
+                elapsed_time = time.time() - float(sys.argv[2])
                 chat_id = int(sys.argv[3])
                 user_id = int(sys.argv[4])
                 user = (await backend.request('users.get', user_ids=user_id, name_case='ins'))[0]
@@ -25,12 +25,13 @@ async def _(app):
 
 
 @plugin.on_commands(['рестарт', 'restart'])
-@admin_role
+@developer_global_role
 async def _(msg, ctx: Context):
     await ctx.reply('Перезагружаюсь...')
-    os.execl(sys.executable, sys.executable,
-             sys.argv[0], "--restarted", str(int(time.time())), ctx.user_uid[:-len(ctx.backend.get_identity())],
+    os.execl(sys.executable,
+             sys.executable,
+             sys.argv[0],
+             "--restarted",
+             str(time.time()),
+             str(ctx.update.receiver_id),
              str(msg.raw['object']['message']['from_id']))
-
-
-

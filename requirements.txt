@@ -4,3 +4,4 @@ psutil
 aioping
 peewee
 peewee-async
+aiomysql

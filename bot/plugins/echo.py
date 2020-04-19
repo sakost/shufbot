@@ -1,9 +1,9 @@
 from kutana import Plugin, Context, Message
 
 
-plugin = Plugin(name='Ae', description='Напиши мне кто ты и я скажу кто ты')
+plugin = Plugin(name='Аы', description='Напиши мне кто ты и я скажу кто ты')
 
 
-@plugin.on_commands(['ае', 'ae'])
+@plugin.on_commands(['аы'])
 async def _(msg: Message, ctx: Context):
-    await ctx.reply('Ае')
+    await ctx.reply('Аы')

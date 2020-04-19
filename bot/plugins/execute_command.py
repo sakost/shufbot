@@ -3,13 +3,13 @@ import traceback
 
 from kutana import Plugin
 
-from bot.roles import admin_role
+from bot.roles import developer_global_role
 
 plugin = Plugin('Execute[admin]', description='выполняет укаазанную команду')
 
 
 @plugin.on_commands(['exec', 'execute'])
-@admin_role
+@developer_global_role
 async def _(msg, ctx):
     try:
         exec(

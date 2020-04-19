@@ -1,12 +1,10 @@
-# todo: insert loop, line 57
-import asyncio
-import peewee
-import logging
 import datetime
-from peewee_async import Manager, MySQLDatabase
+
+import peewee
+from peewee_async import MySQLDatabase
 
 
-database = MySQLDatabase()
+database = MySQLDatabase(None)
 
 
 class Chat(peewee.Model):
@@ -26,11 +24,11 @@ class Chat(peewee.Model):
 class ChatUser(peewee.Model):
     id = peewee.IntegerField(unique=True, null=False)
     role = peewee.IntegerField(default=0)
-    chat = peewee.ForeignKeyField(Chat, backref="users", null=False)
+    chat = peewee.ForeignKeyField(Chat, backref="users", null=False, index=True)
     banned = peewee.BooleanField(default=False)
     muted = peewee.BooleanField(default=False)
-    muted_until = peewee.IntegerField()
-    banned_until = peewee.IntegerField()
+    muted_until = peewee.IntegerField(default=0)
+    banned_until = peewee.IntegerField(default=0)
     warns = peewee.IntegerField(default=0)
     messages = peewee.IntegerField(default=0)
     messages_np = peewee.IntegerField(default=0)
@@ -59,5 +57,3 @@ class User(peewee.Model):
 
 
 models = [User, Chat, ChatUser]
-database.create_tables(models)
-db_manager = Manager(database,)  # loop=loop)

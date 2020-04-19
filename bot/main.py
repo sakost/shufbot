@@ -4,6 +4,19 @@ from kutana import Kutana, load_plugins
 from kutana.backends import Vkontakte
 
 from bot.settings import SHUF_SETTINGS
+from bot.db import models, database
+
+
+def init_db(app):
+    app.config['database'] = database
+    username = app.config['settings']['DB_USER']
+    password = app.config['settings']['DB_PASSWORD']
+    host = app.config['settings']['DB_HOST']
+    db_name = app.config['settings']['DB_NAME']
+    app.config['database'].init(db_name, user=username, password=password, host=host)
+    app.config['database'].create_tables(models)
+    app.config['database'].close()
+    app.config['database'].set_allow_sync(False)
 
 
 def main():
@@ -11,8 +24,9 @@ def main():
 
     backend = Vkontakte(SHUF_SETTINGS['TOKEN'])
     app.add_backend(backend)
-    app.config['prefixes'] = ("test ", "тест ")  #('шаф', 'sb', 'шб', 'shuf', 'shufbot')
     app.config['settings'] = SHUF_SETTINGS
+    app.config['prefixes'] = ("test ", "тест ")  #('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
+    init_db(app)
 
     app.add_plugins(load_plugins(os.path.join(os.curdir, 'bot', 'plugins')))
 
