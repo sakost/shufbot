@@ -21,8 +21,24 @@ class Chat(peewee.Model):
         database = database
 
 
-class ChatUser(peewee.Model):
+class User(peewee.Model):
     id = peewee.IntegerField(unique=True, null=False)
+    role = peewee.IntegerField(default=0)
+    messages = peewee.IntegerField(default=0)
+    messages_np = peewee.IntegerField(default=0)
+    symbols = peewee.IntegerField(default=0)
+    symbols_np = peewee.IntegerField(default=0)
+    voice = peewee.IntegerField(default=0)
+    first_used = peewee.DateTimeField(default=datetime.datetime.now)
+    not_user_mention = peewee.BooleanField(default=False)
+
+    class Meta:
+        database = database
+
+
+class ChatUser(peewee.Model):
+    id = peewee.PrimaryKeyField()
+    user = peewee.ForeignKeyField(User, backref='chats', null=False, index=True)
     role = peewee.IntegerField(default=0)
     chat = peewee.ForeignKeyField(Chat, backref="users", null=False, index=True)
     banned = peewee.BooleanField(default=False)
@@ -36,21 +52,6 @@ class ChatUser(peewee.Model):
     symbols_np = peewee.IntegerField(default=0)
     voice = peewee.IntegerField(default=0)
     first_appeared = peewee.DateTimeField(default=datetime.datetime.now)
-
-    class Meta:
-        database = database
-
-
-class User(peewee.Model):
-    id = peewee.IntegerField(unique=True, null=False)
-    role = peewee.IntegerField(default=0)
-    messages = peewee.IntegerField(default=0)
-    messages_np = peewee.IntegerField(default=0)
-    symbols = peewee.IntegerField(default=0)
-    symbols_np = peewee.IntegerField(default=0)
-    voice = peewee.IntegerField(default=0)
-    first_used = peewee.DateTimeField(default=datetime.datetime.now)
-    not_user_mention = peewee.BooleanField(default=False)
 
     class Meta:
         database = database

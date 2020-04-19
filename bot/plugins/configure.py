@@ -28,9 +28,8 @@ async def _(upd: Update, ctx: Context):
         mgr: Manager = ctx.config['db_manager']
         ctx.user, created = await mgr.get_or_create(User, id=user_id)
         if upd.receiver_type == ReceiverType.MULTI:
-            async with mgr.atomic():
-                ctx.chat, chat_created = await mgr.get_or_create(Chat, id=upd.receiver_id)
-                ctx.chat_user, chat_user_created = await mgr.get_or_create(ChatUser, id=user_id, chat=ctx.chat)
+            ctx.chat, chat_created = await mgr.get_or_create(Chat, id=upd.receiver_id)
+            ctx.chat_user, chat_user_created = await mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
 
 
 @plugin.on_shutdown()
