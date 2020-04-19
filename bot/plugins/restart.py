@@ -20,7 +20,8 @@ async def _(app):
                 user = (await backend.request('users.get', user_ids=user_id, name_case='ins'))[0]
                 user_name = user['first_name'] + ' ' + user['last_name']
                 await backend.send_message(chat_id,
-                                           f"Бот был перезапущен [id{user_id}|{user_name}] за {elapsed_time:.2f} сек")
+                                           f"Бот был перезапущен [id{user_id}|{user_name}] за {elapsed_time:.2f} сек",
+                                           disable_mentions=1)
 
 
 @plugin.on_commands(['рестарт', 'restart'])
