@@ -6,7 +6,7 @@ from kutana import Plugin, Context
 
 from bot.roles import admin_role
 
-plugin = Plugin('Restart', 'restart bot')
+plugin = Plugin('Manage process', '(re)start bot')
 
 
 @plugin.on_start()
@@ -30,3 +30,10 @@ async def _(msg, ctx: Context):
     os.execl(sys.executable, sys.executable,
              sys.argv[0], "--restarted", str(int(time.time())), ctx.user_uid[:-len(ctx.backend.get_identity())],
              str(msg.raw['object']['message']['from_id']))
+
+
+@plugin.on_commands(['стоп', 'stop', 'shutdown'])
+@admin_role
+async def _(msg, ctx):
+    await ctx.reply('Выключаюсь..')
+    ctx.app.stop()
