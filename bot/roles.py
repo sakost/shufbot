@@ -35,14 +35,17 @@ def restrict_access(level, global_=False):
             msg, ctx, *_ = args
             user_id = msg.sender_id
 
-            if is_owner(user_id, ctx.config):
-                return await func(*args, **kwargs)
-
             mgr: Manager = ctx.config['db_manager']
             if global_:
                 user, created = await mgr.get_or_create(User, id=user_id)
             else:
                 user, created = await mgr.get_or_create(ChatUser, id=user_id)
+
+            if is_owner(user_id, ctx.config):
+                if user.role != Roles.OWNER.value:
+                    user.role = Roles.OWNER.value
+                    await mgr.update(user)
+                return await func(*args, **kwargs)
             if user.role >= level.value:
                 return await func(*args, **kwargs)
             await ctx.reply("У вас недостаточно прав для этой команды!")
