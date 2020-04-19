@@ -1,3 +1,4 @@
+import sys
 import traceback
 
 from kutana import Plugin
@@ -11,6 +12,9 @@ plugin = Plugin('Execute[admin]', description='выполняет укаазан
 @admin_role
 async def _(msg, ctx):
     try:
-        exec(ctx.body)
+        exec(
+            "async def __ex(msg, ctx): " + ctx.body,
+        )
+        await locals()['__ex'](msg, ctx)
     except Exception as e:
-        ctx.reply(f"Error occurred:\n{''.join(traceback.format_exc(e))}")
+        await ctx.reply(f"Error occurred:\n{''.join(traceback.format_exception_only(*sys.exc_info()[:2]))}")
