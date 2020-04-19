@@ -15,7 +15,8 @@ async def _(msg, ctx):
                                                  shell=True,
                                                  stdout=asyncio.subprocess.PIPE,
                                                  stderr=asyncio.subprocess.PIPE,
-                                                 stdin=asyncio.subprocess.PIPE
+                                                 stdin=asyncio.subprocess.PIPE,
+                                                 loop=ctx.app.get_loop()
                                                  )
     stdout, stderr = await proc.communicate()
 
