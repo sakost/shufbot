@@ -1,7 +1,9 @@
 import os
+import logging
 
 from kutana import Kutana, load_plugins
 from kutana.backends import Vkontakte
+from kutana.logger import set_logger_level
 
 from bot.settings import SHUF_SETTINGS
 from bot.db import models, database
@@ -21,6 +23,7 @@ def init_db(app):
 
 def main():
     app = Kutana()
+    set_logger_level(logging.DEBUG)
 
     backend = Vkontakte(SHUF_SETTINGS['TOKEN'])
     app.add_backend(backend)
