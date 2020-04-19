@@ -2,3 +2,5 @@ kutana
 python-dotenv
 psutil
 aioping
+peewee
+peewee-async
