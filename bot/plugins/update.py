@@ -20,7 +20,7 @@ async def _(msg, ctx):
     stdout, stderr = await proc.communicate()
 
     if proc.returncode != 0 and stderr:
-        ctx.reply('Во время обновления произошла ошибка:\n' + stderr.decode())
+        await ctx.reply('Во время обновления произошла ошибка:\n' + stderr.decode())
     if stdout:
-        ctx.reply(stdout.decode())
+        await ctx.reply(stdout.decode())
     await restart_command(msg, ctx)
