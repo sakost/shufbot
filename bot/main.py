@@ -25,7 +25,7 @@ def main():
     backend = Vkontakte(SHUF_SETTINGS['TOKEN'])
     app.add_backend(backend)
     app.config['settings'] = SHUF_SETTINGS
-    app.config['prefixes'] = ("test ", "тест ")  #('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
+    app.config['prefixes'] = ('еш ', 'есб ', 'esb ', 'ешаф ', 'eshuf ')  # ('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
     init_db(app)
 
     app.add_plugins(load_plugins(os.path.join(os.curdir, 'bot', 'plugins')))
