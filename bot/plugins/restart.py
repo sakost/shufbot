@@ -33,8 +33,4 @@ async def _(msg, ctx: Context):
              str(msg.raw['object']['message']['from_id']))
 
 
-@plugin.on_commands(['стоп', 'stop', 'shutdown'])
-@admin_role
-async def _(msg, ctx):
-    await ctx.reply('Выключаюсь..')
-    ctx.app.stop()
+
