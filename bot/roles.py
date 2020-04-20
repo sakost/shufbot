@@ -3,6 +3,8 @@ from functools import wraps
 
 from peewee_async import Manager
 
+from kutana.exceptions import RequestException
+
 from bot.db import User, ChatUser
 
 
@@ -76,3 +78,15 @@ def admin_role(func):
 def vip_role(func):
     return restrict_access(ChatRoles.VIP_USER)(func)
 
+
+def needed_admin_rights(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        msg, ctx, *_ = args
+        try:
+            return await func(*args, **kwargs)
+        except RequestException as e:
+            if e.response.get('error', {'error_code': -1}) != 917:
+                raise
+            await ctx.reply('У бота недостаточно прав для этого действия')
+    return wrapper
