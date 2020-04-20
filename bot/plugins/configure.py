@@ -7,6 +7,7 @@ from kutana import Plugin, Kutana, Update, UpdateType, Context
 from kutana.update import ReceiverType
 
 from bot.db import ChatUser, User, Chat
+from bot.scheduler import init_scheduler
 
 plugin = Plugin('Configure[system]')
 
@@ -21,6 +22,8 @@ async def _(app: Kutana):
         if backend.get_identity() == 'vkontakte':
             app.config['owner_id'] = (await backend.resolve_screen_name(app.config['settings']['OWNER_ID']))['object_id']
             await init_db(app)
+            # order is important
+            await init_scheduler(app)
             break
 
 

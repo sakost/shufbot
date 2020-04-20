@@ -1,5 +1,6 @@
 import os
 # import logging
+from datetime import time
 
 from kutana import Kutana, load_plugins
 from kutana.backends import Vkontakte
@@ -29,6 +30,7 @@ def main():
     app.add_backend(backend)
     app.config['settings'] = SHUF_SETTINGS
     app.config['prefixes'] = ('еш ', 'есб ', 'esb ', 'ешаф ', 'eshuf ')  # ('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
+    app.config['inform_time'] = time(12, 00)  # 12:00
     init_db(app)
 
     app.add_plugins(load_plugins(os.path.join(os.curdir, 'bot', 'plugins')))
