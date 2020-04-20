@@ -56,7 +56,7 @@ async def _(msg: Message, ctx):
             chat_user_added.banned = False
             chat_user_added.banned_until = 0
             await ctx.mgr.update(chat_user_added)
-            await ctx.reply(f'[id{chat_user_added.user.get_id}|Пользователь] разбанен', disable_mentions=1)
+            await ctx.reply(f'[id{chat_user_added.user.id}|Пользователь] разбанен', disable_mentions=1)
             return
     if not ctx.chat.kick_left:
         return HandlerResponse.SKIPPED

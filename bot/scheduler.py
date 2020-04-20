@@ -29,7 +29,7 @@ async def inform(app):
             mgr: Manager = app.config['db_manager']
             chats = await mgr.execute(Chat.select(Chat.level == ChatRoles.DEVELOPER.value))
             for chat in chats:
-                await backend.send_message(chat.get_id, '[Автоинформирование]\n' + await compute_stat(app))
+                await backend.send_message(chat.id, '[Автоинформирование]\n' + await compute_stat(app))
             break
     await app.scheduler.spawn(inform(app))
 
