@@ -35,3 +35,8 @@ async def _(upd: Update, ctx: Context):
 @plugin.on_shutdown()
 async def _(app: Kutana):
     await app.config['db_manager'].close()
+
+
+@plugin.on_exception()
+async def _(upd, ctx: Context, exc: Exception):
+    await ctx.send_message(ctx.config['owner_id'], repr(exc))
