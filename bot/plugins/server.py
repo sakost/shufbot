@@ -6,13 +6,13 @@ import aioping
 
 from kutana import Plugin
 
-from bot.roles import admin_role
+from bot.roles import developer_global_role
 
 plugin = Plugin('Server[admin]', 'pings to servers')
 
 
 @plugin.on_commands(['метрик', 'server', 'серв', 'metrics'])
-@admin_role
+@developer_global_role
 async def _(msg, ctx):
     p = psutil.cpu_percent(interval=1, percpu=True)
     cur_process = psutil.Process(os.getpid())
