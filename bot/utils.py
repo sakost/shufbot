@@ -26,18 +26,17 @@ async def extract_mentioned_users(ctx):
 
 async def extract_users(msg, ctx):
     users = []
-    if not ctx.body:
-        raw_msg = msg.raw['object']['message']
-        reply_msg = raw_msg.get('reply_message', None)
-        fwd_messages = raw_msg.get('fwd_messages', [])
+    raw_msg = msg.raw['object']['message']
+    reply_msg = raw_msg.get('reply_message', None)
+    fwd_messages = raw_msg.get('fwd_messages', [])
 
-        if reply_msg is not None:
-            users.append(reply_msg['from_id'])
+    if reply_msg is not None:
+        users.append(reply_msg['from_id'])
 
-        for fwd_msg in fwd_messages:
-            users.append(fwd_msg['from_id'])
-        # let other coroutines to work
-        await asyncio.sleep(0)
+    for fwd_msg in fwd_messages:
+        users.append(fwd_msg['from_id'])
+    # let other coroutines to work
+    await asyncio.sleep(0)
     users.extend(await extract_mentioned_users(ctx))
     await asyncio.sleep(0)
     users.extend(await extract_users_urls(ctx))
