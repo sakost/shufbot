@@ -36,13 +36,11 @@ async def _(msg, ctx):
 @needed_admin_rights
 async def _(msg: Message, ctx):
     if not hasattr(ctx, 'chat'):
-        await ctx.send_message(ctx.config['owner_id'], 'pass1')
         return HandlerResponse.SKIPPED
 
     # not action message OR not appropriate type of action
     if (action := msg.raw['object']['message'].get('action', {'type': ''}))['type'] != 'chat_kick_user' and \
             not action['type'].startswith('chat_invite_user'):
-        await ctx.send_message(ctx.config['owner_id'], 'pass2')
         return HandlerResponse.SKIPPED
 
     # banned user invited to chat
@@ -50,11 +48,9 @@ async def _(msg: Message, ctx):
         user_added, _ = await ctx.mgr.get_or_create(User, id=action['member_id'])
         chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
         if not chat_user_added.banned:
-            await ctx.send_message(ctx.config['owner_id'], 'pass3')
             return HandlerResponse.SKIPPED
         if (chat_user_added.banned_until == -1 or chat_user_added.banned_until > time.time())\
                 and ctx.chat_user.role < ChatUserRoles.ADMIN:
-            await ctx.send_message(ctx.config['owner_id'], 'ban')
             return await kick_users(ctx, [chat_user_added], msg.receiver_id - 2 * 10 ** 9)
         else:
             chat_user_added.banned = False
