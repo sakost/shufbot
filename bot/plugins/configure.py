@@ -1,3 +1,6 @@
+import sys
+import logging
+
 from peewee_async import Manager
 
 from kutana import Plugin, Kutana, Update, UpdateType, Context
@@ -39,4 +42,5 @@ async def _(app: Kutana):
 
 @plugin.on_exception()
 async def _(upd, ctx: Context, exc: Exception):
+    logging.exception('Exception occurred', exc_info=sys.exc_info())
     await ctx.send_message(ctx.config['owner_id'], repr(exc))
