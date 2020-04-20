@@ -7,7 +7,7 @@ from bot.router import AnyMessageRouterCustom
 plugin = Plugin('Autokick', 'Автокик вышедших')
 
 
-@plugin.on_commands(['автокик', 'autockick'])
+@plugin.on_commands(['автокик', 'autokick'])
 @admin_role
 async def _(msg, ctx):
     commands = {
