@@ -1,6 +1,8 @@
-from bot.roles import admin_role, needed_admin_rights
+from kutana import Message, HandlerResponse
 
-from kutana import Plugin, Message, HandlerResponse
+from bot.roles import admin_role, needed_admin_rights
+from bot.plugin import CustomPlugin as Plugin
+from bot.router import AnyMessageRouterCustom
 
 plugin = Plugin('Autokick', 'Автокик вышедших')
 
@@ -25,7 +27,7 @@ async def _(msg, ctx):
     await ctx.reply(f'Автокик {"включен" if ctx.chat.kick_left else "выключен"}')
 
 
-@plugin.on_any_message()
+@plugin.on_router(AnyMessageRouterCustom)
 async def _(msg: Message, ctx):
     if not ctx.chat.kick_left:
         return HandlerResponse.SKIPPED
