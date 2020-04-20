@@ -51,13 +51,12 @@ async def _(msg: Message, ctx):
             return HandlerResponse.SKIPPED
         if (chat_user_added.banned_until == -1 or chat_user_added.banned_until > time.time())\
                 and ctx.chat_user.role < ChatUserRoles.ADMIN:
-            return await kick_users(ctx, [chat_user_added], msg.receiver_id - 2 * 10 ** 9)
+            return await kick_users(ctx, [(user_added, chat_user_added)], msg.receiver_id - 2 * 10 ** 9)
         else:
             chat_user_added.banned = False
             chat_user_added.banned_until = 0
-            user = await ctx.mgr.get(chat_user_added.get_user())
             await ctx.mgr.update(chat_user_added)
-            await ctx.reply(f'[id{user.get_id}|Пользователь] разбанен', disable_mentions=1)
+            await ctx.reply(f'[id{user_added.get_id}|Пользователь] разбанен', disable_mentions=1)
             return
     if not ctx.chat.kick_left:
         return HandlerResponse.SKIPPED
@@ -66,4 +65,4 @@ async def _(msg: Message, ctx):
     if action['member_id'] != msg.sender_id:
         return HandlerResponse.SKIPPED
 
-    await kick_users(ctx, [ctx.chat_user], msg.receiver_id - 2 * 10 ** 9)
+    await kick_users(ctx, [(ctx.user, ctx.chat_user)], msg.receiver_id - 2 * 10 ** 9)
