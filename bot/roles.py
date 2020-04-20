@@ -8,14 +8,14 @@ from kutana.exceptions import RequestException
 from bot.db import User, ChatUser
 
 
-class ChatRoles(IntEnum):
+class ChatUserRoles(IntEnum):
     USER = 0
     VIP_USER = auto()
     ADMIN = auto()
     CREATOR = auto()
 
 
-class Roles(IntEnum):
+class UserRoles(IntEnum):
     USER = 0
     DONATER = auto()
     DEVELOPER = auto()
@@ -29,7 +29,7 @@ def is_owner(user_id, config):
 def restrict_access(level, global_=False):
     """
     :param level is the Role or ChatRole from this scope
-    :param global_ is whether use global settings for user or not. ChatRoles for default
+    :param global_ is whether use global settings for user or not. ChatUserRoles for default
     """
     def decorator(func):
         @wraps(func)
@@ -44,8 +44,8 @@ def restrict_access(level, global_=False):
                 user, created = await mgr.get_or_create(ChatUser, user=user)
 
             if is_owner(user_id, ctx.config):
-                if global_ and user.role != Roles.OWNER.value:
-                    user.role = Roles.OWNER.value
+                if global_ and user.role != UserRoles.OWNER.value:
+                    user.role = UserRoles.OWNER.value
                     await mgr.update(user)
                 return await func(*args, **kwargs)
             if user.role >= level.value:
@@ -56,27 +56,27 @@ def restrict_access(level, global_=False):
 
 
 def owner_global_role(func):
-    return restrict_access(Roles.OWNER, global_=True)(func)
+    return restrict_access(UserRoles.OWNER, global_=True)(func)
 
 
 def developer_global_role(func):
-    return restrict_access(Roles.DEVELOPER, global_=True)(func)
+    return restrict_access(UserRoles.DEVELOPER, global_=True)(func)
 
 
 def donater_global_role(func):
-    return restrict_access(Roles.DONATER, global_=True)(func)
+    return restrict_access(UserRoles.DONATER, global_=True)(func)
 
 
 def creator_role(func):
-    return restrict_access(ChatRoles.CREATOR)(func)
+    return restrict_access(ChatUserRoles.CREATOR)(func)
 
 
 def admin_role(func):
-    return restrict_access(ChatRoles.ADMIN)(func)
+    return restrict_access(ChatUserRoles.ADMIN)(func)
 
 
 def vip_role(func):
-    return restrict_access(ChatRoles.VIP_USER)(func)
+    return restrict_access(ChatUserRoles.VIP_USER)(func)
 
 
 def needed_admin_rights(func):
