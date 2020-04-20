@@ -37,8 +37,6 @@ async def _(msg, ctx):
 async def _(msg: Message, ctx):
     if not hasattr(ctx, 'chat'):
         return HandlerResponse.SKIPPED
-    if not ctx.chat.kick_left:
-        return HandlerResponse.SKIPPED
 
     # not action message OR not appropriate type of action
     if (action := msg.raw['object']['message'].get('action', {'type': ''}))['type'] != 'chat_kick_user' and \
@@ -60,6 +58,8 @@ async def _(msg: Message, ctx):
             await ctx.mgr.update(chat_user_added)
             await ctx.reply(f'[id{chat_user_added.user.get_id}|Пользователь] разбанен', disable_mentions=1)
             return
+    if not ctx.chat.kick_left:
+        return HandlerResponse.SKIPPED
 
     # somebody kicked user
     if action['member_id'] != msg.sender_id:
