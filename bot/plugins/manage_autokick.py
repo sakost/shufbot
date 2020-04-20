@@ -37,6 +37,6 @@ async def _(msg: Message, ctx):
         return HandlerResponse.SKIPPED
 
     async def handler(msg, ctx):
-        await ctx.request('messages.removeChatUser', chat_id=msg.receiver_id, member_id=msg.sender_id)
+        await ctx.request('messages.removeChatUser', chat_id=msg.receiver_id-2*10**9, member_id=msg.sender_id)
     await needed_admin_rights(handler)(msg, ctx)
 
