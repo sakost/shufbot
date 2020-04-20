@@ -41,6 +41,7 @@ async def _(upd: Update, ctx: Context):
 @plugin.on_shutdown()
 async def _(app: Kutana):
     await app.config['db_manager'].close()
+    await app.config['scheduler'].close()
 
 
 @plugin.on_exception()
