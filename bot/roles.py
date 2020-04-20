@@ -58,9 +58,9 @@ def restrict_access(level, global_=False):
 
             mgr: Manager = ctx.mgr
 
-            user, created = await mgr.get_or_create(User, id=user_id)
+            user = ctx.user
             if not global_:
-                user, created = await mgr.get_or_create(ChatUser, user=user)
+                user = ctx.chat_user
 
             if is_owner(user_id, ctx.config):
                 if global_ and user.role != UserRoles.OWNER.value:
