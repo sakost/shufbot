@@ -3,6 +3,7 @@ from kutana import Message, HandlerResponse
 from bot.roles import admin_role, needed_admin_rights
 from bot.plugin import CustomPlugin as Plugin
 from bot.router import AnyMessageRouterCustom
+from bot.plugins.kick import kick_users
 
 plugin = Plugin('Autokick', 'Автокик вышедших')
 
@@ -28,6 +29,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_router(AnyMessageRouterCustom)
+@needed_admin_rights
 async def _(msg: Message, ctx):
     if not hasattr(ctx, 'chat'):
         return HandlerResponse.SKIPPED
@@ -38,7 +40,5 @@ async def _(msg: Message, ctx):
     if action['member_id'] != msg.sender_id:
         return HandlerResponse.SKIPPED
 
-    async def handler(msg, ctx):
-        await ctx.request('messages.removeChatUser', chat_id=msg.receiver_id-2*10**9, member_id=msg.sender_id)
-    await needed_admin_rights(handler)(msg, ctx)
+    await kick_users(ctx, [msg.sender_id], msg.receiver_id-2*10**9)
 
