@@ -109,3 +109,14 @@ def needed_admin_rights(func):
                 raise
             await ctx.reply('У бота недостаточно прав для этого действия')
     return wrapper
+
+
+def chat_only(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        msg, ctx, *_ = args
+        if not hasattr(ctx, 'chat'):
+            ctx.reply('Чат не является бесдой')
+            return
+        return await func(*args, **kwargs)
+    return wrapper
