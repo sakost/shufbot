@@ -1,11 +1,13 @@
-from kutana import Plugin, HandlerResponse
+from kutana import HandlerResponse
 
 from bot.roles import needed_admin_rights
+from bot.plugin import CustomPlugin
+from bot.router import AnyMessageRouterCustom
 
-plugin = Plugin('Hello message')
+plugin = CustomPlugin('Hello message')
 
 
-@plugin.on_any_message(priority=-1)
+@plugin.on_router(AnyMessageRouterCustom)
 @needed_admin_rights
 async def _(msg, ctx):
     if not hasattr(ctx, 'chat'):
