@@ -25,7 +25,8 @@ async def _(msg, ctx):
         await ctx.reply('Неизвестный уровень чата. Доступные уровни: \n' + '\n'.join(
             f"{num}){', '.join(lvl_names)}" for num, lvl_names in enumerate(CHAT_LEVEL.values(), 1)
         ))
-    await ctx.reply('Чат не является беседой')
+    else:
+        await ctx.reply('Чат не является беседой')
 
 
 @plugin.on_commands(['чатлвл', 'chat_lvl', 'чатлевел', 'chat_level'])
