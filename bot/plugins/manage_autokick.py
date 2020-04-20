@@ -2,9 +2,10 @@ import time
 
 from kutana import Message, HandlerResponse
 
+from bot.db import ChatUser, User
 from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.kick import kick_users
-from bot.roles import admin_role, needed_admin_rights
+from bot.roles import admin_role, needed_admin_rights, ChatUserRoles
 from bot.router import AnyMessageRouterCustom
 
 plugin = Plugin('Autokick', 'Автокик вышедших')
@@ -45,17 +46,23 @@ async def _(msg: Message, ctx):
         return HandlerResponse.SKIPPED
 
     # banned user invited to chat
-    if ctx.user.banned and action['type'].startswith('chat_invite_user'):
-        if ctx.user.banned_until == -1 or ctx.user.banned_until > time.time():
-            return await kick_users(ctx, [msg.sender_id], msg.receiver_id - 2 * 10 ** 9)
+    if action['type'].startswith('chat_invite_user'):
+        user_added, _ = await ctx.mgr.get_or_create(User, id=action['member_id'])
+        chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
+        if not chat_user_added.banned:
+            return HandlerResponse.SKIPPED
+        if (chat_user_added.banned_until == -1 or chat_user_added.banned_until > time.time())\
+                and ctx.chat_user.role < ChatUserRoles.ADMIN:
+            return await kick_users(ctx, [chat_user_added], msg.receiver_id - 2 * 10 ** 9)
         else:
-            ctx.user.banned = False
-            ctx.user.banned_until = 0
-            await ctx.mgr.update(ctx.user)
+            chat_user_added.banned = False
+            chat_user_added.banned_until = 0
+            await ctx.mgr.update(chat_user_added)
+            await ctx.reply(f'[id{chat_user_added.user.get_id}|Пользователь] разбанен', disable_mentions=1)
             return
 
     # somebody kicked user
     if action['member_id'] != msg.sender_id:
         return HandlerResponse.SKIPPED
 
-    await kick_users(ctx, [msg.sender_id], msg.receiver_id - 2 * 10 ** 9)
+    await kick_users(ctx, [ctx.chat_user], msg.receiver_id - 2 * 10 ** 9)
