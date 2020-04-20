@@ -56,5 +56,9 @@ class ChatUser(peewee.Model):
     class Meta:
         database = database
 
+    @classmethod
+    def get_user(cls, chat_user):
+        return cls.select(cls, User).join(User).switch(cls)
+
 
 models = [User, Chat, ChatUser]
