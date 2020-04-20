@@ -1,6 +1,6 @@
 from kutana import Plugin
 
-from bot.roles import admin_role, ChatUserRoles, chat_only
+from bot.roles import admin_role, ChatUserRoles, chat_only, is_owner
 from bot.utils import extract_users
 from bot.db import ChatUser, User
 
@@ -21,7 +21,8 @@ plugin = Plugin('Manage chat users[develop]', 'Manage chat users roles')
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     for lvl, lvl_names in CHAT_USER_ROLES.items():
-        if lvl == ChatUserRoles.ADMIN and ctx.chat_user.role < ChatUserRoles.CREATOR.value:
+        if lvl == ChatUserRoles.ADMIN and ctx.chat_user.role < ChatUserRoles.CREATOR.value and \
+                not is_owner(ctx.user.get_id, ctx.config):
             break
         for name in lvl_names:
             if ctx.body.startswith(name):
