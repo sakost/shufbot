@@ -55,7 +55,7 @@ async def _(msg: Message, ctx):
         else:
             chat_user_added.banned = False
             chat_user_added.banned_until = 0
-            user = await ctx.mgr.get(ChatUser.get_user(chat_user_added))
+            user = await ctx.mgr.get(chat_user_added.get_user())
             await ctx.mgr.update(chat_user_added)
             await ctx.reply(f'[id{user.get_id}|Пользователь] разбанен', disable_mentions=1)
             return

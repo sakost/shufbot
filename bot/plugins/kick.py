@@ -31,5 +31,5 @@ async def kick_users(ctx, users, chat_id):
             chat_user.banned_until = -1
             await ctx.mgr.update(chat_user)
             if user is None:
-                user = await ctx.mgr.get(ChatUser.get_user(chat_user))
+                user = await ctx.mgr.get(chat_user.get_user())
             await ctx.request('messages.removeChatUser', chat_id=chat_id, member_id=user.get_id)
