@@ -6,4 +6,4 @@ plugin = Plugin(name='Аы', description='Напиши мне кто ты и я 
 
 @plugin.on_commands(['аы', 'шуе'])
 async def _(msg: Message, ctx: Context):
-    await ctx.reply(ctx.body.capitalize())
+    await ctx.reply(ctx.command.capitalize())
