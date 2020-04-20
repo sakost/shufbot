@@ -105,7 +105,7 @@ def needed_admin_rights(func):
         try:
             return await func(*args, **kwargs)
         except RequestException as e:
-            if e.response.get('error', {'error_code': -1}) not in (917, 925):
+            if e.error.get('error', {'error_code': -1}) not in (917, 925):
                 raise
             await ctx.reply('У бота недостаточно прав для этого действия')
     return wrapper
