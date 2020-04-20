@@ -12,11 +12,11 @@ async def _(msg, ctx: Context):
     mgr = ctx.config['db_manager']
     peer_id = msg.receiver_id
     try:
-        resp = await ctx.request('messages.getConversationMembers', peer_id=peer_id)
+        await ctx.request('messages.getConversationMembers', peer_id=peer_id)
     except RequestException as e:
         await ctx.reply('Я не админ :с')
+        ctx.chat.admin = False
     else:
         await ctx.reply('Я админ.. хе-хе')
-        chat, created = await mgr.get_or_create(Chat, id=peer_id)
-        chat.admin = True
-        await mgr.update(chat)
+        ctx.chat.admin = True
+    await mgr.update(ctx.chat)
