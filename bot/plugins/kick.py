@@ -12,7 +12,10 @@ plugin = Plugin('Kick', 'кикает пользователя из беседы
 @admin_role
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
-    await kick_users(ctx, users, msg.receiver_id - 2*10**9)
+    if users:
+        await kick_users(ctx, users, msg.receiver_id - 2*10**9)
+    else:
+        await ctx.reply('Вы не указали ни одного пользователя')
 
 
 async def kick_users(ctx, users, chat_id):
