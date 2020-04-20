@@ -3,9 +3,16 @@ from functools import wraps
 
 from peewee_async import Manager
 
+from kutana import HandlerResponse
 from kutana.exceptions import RequestException
 
 from bot.db import User, ChatUser
+
+
+class ChatRoles(IntEnum):
+    NORMAL = 0
+    IMPROVED = auto()
+    DEVELOPER = auto()
 
 
 class ChatUserRoles(IntEnum):
@@ -20,6 +27,18 @@ class UserRoles(IntEnum):
     DONATER = auto()
     DEVELOPER = auto()
     OWNER = auto()
+
+
+def restrict_chat_access(level):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            msg, ctx, *_ = args
+            if level.value < ctx.chat.level:
+                return HandlerResponse.SKIPPED
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def is_owner(user_id, config):
@@ -37,7 +56,7 @@ def restrict_access(level, global_=False):
             msg, ctx, *_ = args
             user_id = msg.sender_id
 
-            mgr: Manager = ctx.config['db_manager']
+            mgr: Manager = ctx.mgr
 
             user, created = await mgr.get_or_create(User, id=user_id)
             if not global_:
