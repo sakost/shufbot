@@ -25,11 +25,11 @@ async def _(app: Kutana):
 async def _(upd: Update, ctx: Context):
     if upd.type == UpdateType.MSG:
         user_id = upd.raw['object']['message']['from_id']
-        mgr: Manager = ctx.config['db_manager']
-        ctx.user, created = await mgr.get_or_create(User, id=user_id)
+        ctx.mgr: Manager = ctx.config['db_manager']
+        ctx.user, created = await ctx.mgr.get_or_create(User, id=user_id)
         if upd.receiver_type == ReceiverType.MULTI:
-            ctx.chat, chat_created = await mgr.get_or_create(Chat, id=upd.receiver_id)
-            ctx.chat_user, chat_user_created = await mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
+            ctx.chat, chat_created = await ctx.mgr.get_or_create(Chat, id=upd.receiver_id)
+            ctx.chat_user, chat_user_created = await ctx.mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
 
 
 @plugin.on_shutdown()
