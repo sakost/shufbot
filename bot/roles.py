@@ -36,10 +36,10 @@ def restrict_access(level, global_=False):
             user_id = msg.sender_id
 
             mgr: Manager = ctx.config['db_manager']
-            if global_:
-                user, created = await mgr.get_or_create(User, id=user_id)
-            else:
-                user, created = await mgr.get_or_create(ChatUser, id=user_id)
+
+            user, created = await mgr.get_or_create(User, id=user_id)
+            if not global_:
+                user, created = await mgr.get_or_create(ChatUser, user=user)
 
             if global_ and is_owner(user_id, ctx.config):
                 if user.role != Roles.OWNER.value:
