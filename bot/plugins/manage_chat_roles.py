@@ -35,6 +35,15 @@ async def _(msg, ctx):
                 return
     await ctx.reply('Неизвестный уровень доступа для пользователя. Доступные уровни: \n' + '\n'.join(
         f"{num}){', '.join(lvl_names)}" for num, lvl_names in
-        enumerate(CHAT_USER_ROLES.values()[:-1-bool(ctx.chat_user.role != ChatUserRoles.CREATOR.value)], 1)
+        enumerate(list(CHAT_USER_ROLES.values())[:-1-bool(ctx.chat_user.role != ChatUserRoles.CREATOR.value)], 1)
     ))
 
+
+@plugin.on_commands(['роль', 'role'])
+@chat_only
+async def _(msg, ctx):
+    for role in CHAT_USER_ROLES:
+        if role.value == ctx.chat_user.role:
+            role_name = CHAT_USER_ROLES[role][0]
+            await ctx.reply(f'У пользователя установлена роль "{role_name}"')
+            break
