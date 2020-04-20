@@ -29,6 +29,8 @@ async def _(msg, ctx):
 
 @plugin.on_router(AnyMessageRouterCustom)
 async def _(msg: Message, ctx):
+    if not hasattr(ctx, 'chat'):
+        return HandlerResponse.SKIPPED
     if not ctx.chat.kick_left:
         return HandlerResponse.SKIPPED
     if (action := msg.raw['object']['message'].get('action', {'type': None}))['type'] != 'chat_kick_user':
