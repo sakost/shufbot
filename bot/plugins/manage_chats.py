@@ -31,6 +31,6 @@ async def _(msg, ctx):
 @plugin.on_commands(['чатлвл', 'chat_lvl', 'чатлевел', 'chat_level'])
 async def _(msg, ctx):
     if hasattr(ctx, 'chat'):
-        await ctx.reply('Уровень чата "обычный" установлен')
+        await ctx.reply(f'Установлен уровень чата "{CHAT_LEVEL[ctx.chat.level][0]}"')
     else:
         await ctx.reply('Чат не является беседой')
