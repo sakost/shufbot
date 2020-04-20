@@ -10,7 +10,7 @@ from bot.roles import ChatRoles
 
 
 async def compute_stat(app) -> str:
-    pass
+    return "stub"
 
 
 def calculate_sleep_time(dt: datetime):
