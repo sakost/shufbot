@@ -63,13 +63,10 @@ async def _(msg: Message, ctx):
             await ctx.reply(f'[id{chat_user_added.user.get_id}|Пользователь] разбанен', disable_mentions=1)
             return
     if not ctx.chat.kick_left:
-        await ctx.send_message(ctx.config['owner_id'], 'pass4')
         return HandlerResponse.SKIPPED
 
     # somebody kicked user
     if action['member_id'] != msg.sender_id:
-        await ctx.send_message(ctx.config['owner_id'], 'pass5')
         return HandlerResponse.SKIPPED
 
-    await ctx.send_message(ctx.config['owner_id'], 'ban2')
     await kick_users(ctx, [ctx.chat_user], msg.receiver_id - 2 * 10 ** 9)
