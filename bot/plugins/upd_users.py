@@ -19,8 +19,8 @@ async def _(msg, ctx):
 async def update_users(ctx):
     resp = await ctx.request('messages.getConversationMembers', peer_id=ctx.chat.id)
     for member in resp['items']:
-        user, _ = ctx.mgr.get_or_create(User, id=member['member_id'])
-        chat_user, _ = ctx.mgr.get_or_create(ChatUser, user=user, chat=ctx.chat)
+        user, _ = await ctx.mgr.get_or_create(User, id=member['member_id'])
+        chat_user, _ = await ctx.mgr.get_or_create(ChatUser, user=user, chat=ctx.chat)
         if member.get('is_owner', False):
             chat_user.role = ChatUserRoles.CREATOR.value
         elif member.get('is_admin', False):
