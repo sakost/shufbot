@@ -21,7 +21,7 @@ class ActionMessageRouter(MapRouter):
     def _get_keys(self, update, ctx):
         if update.type != UpdateType.MSG:
             return ()
-        if action := update.raw['object']['message'].get('action', None) is None:
+        if (action := update.raw['object']['message'].get('action', None)) is None:
             return ()
         ctx.action_type = action['type']
         ctx.action = action
