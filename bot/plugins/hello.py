@@ -25,6 +25,7 @@ async def _(msg, ctx):
     # ctx.request("", ) # todo get a registration date
     if not chat_user_added.banned:
         await ctx.reply(hello_message)
+        return
     if (chat_user_added.banned_until == -1 or chat_user_added.banned_until > time.time()) \
             and ctx.chat_user.role < ChatUserRoles.ADMIN:
         return await kick_users(ctx, [(user_added, chat_user_added)], msg.receiver_id - 2 * 10 ** 9)
