@@ -1,12 +1,8 @@
-import time
-
 from kutana import Message, HandlerResponse
 
-from bot.db import ChatUser, User
 from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.kick import kick_users
-from bot.roles import admin_role, needed_admin_rights, ChatUserRoles
-from bot.router import AnyMessageRouterCustom
+from bot.roles import admin_role, needed_admin_rights
 
 plugin = Plugin('Autokick', 'Автокик вышедших')
 
@@ -32,37 +28,17 @@ async def _(msg, ctx):
     await ctx.reply(f'Автокик {"включен" if ctx.chat.kick_left else "выключен"}')
 
 
-@plugin.on_router(AnyMessageRouterCustom)
+@plugin.on_message_action('chat_kick_user')
 @needed_admin_rights
 async def _(msg: Message, ctx):
     if not hasattr(ctx, 'chat'):
         return HandlerResponse.SKIPPED
 
-    # not action message OR not appropriate type of action
-    if (action := msg.raw['object']['message'].get('action', {'type': ''}))['type'] != 'chat_kick_user' and \
-            not action['type'].startswith('chat_invite_user'):
-        return HandlerResponse.SKIPPED
-
-    # banned user invited to chat
-    if action['type'].startswith('chat_invite_user'):
-        user_added, _ = await ctx.mgr.get_or_create(User, id=action['member_id'])
-        chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
-        if not chat_user_added.banned:
-            return HandlerResponse.SKIPPED
-        if (chat_user_added.banned_until == -1 or chat_user_added.banned_until > time.time())\
-                and ctx.chat_user.role < ChatUserRoles.ADMIN:
-            return await kick_users(ctx, [(user_added, chat_user_added)], msg.receiver_id - 2 * 10 ** 9)
-        else:
-            chat_user_added.banned = False
-            chat_user_added.banned_until = 0
-            await ctx.mgr.update(chat_user_added)
-            await ctx.reply(f'[id{user_added.id}|Пользователь] разбанен', disable_mentions=1)
-            return
     if not ctx.chat.kick_left:
         return HandlerResponse.SKIPPED
 
     # somebody kicked user
-    if action['member_id'] != msg.sender_id:
+    if ctx.action['member_id'] != msg.sender_id:
         return HandlerResponse.SKIPPED
 
     await kick_users(ctx, [(ctx.user, ctx.chat_user)], msg.receiver_id - 2 * 10 ** 9)
