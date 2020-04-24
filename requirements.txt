@@ -6,3 +6,4 @@ peewee
 peewee-async
 aiomysql
 aiojobs
+aiohttp
