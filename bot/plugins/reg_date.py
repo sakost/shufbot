@@ -1,7 +1,6 @@
 import time
 
 from bot.plugin import CustomPlugin as Plugin
-from bot.roles import chat_only
 from bot.utils import extract_users
 
 plugin = Plugin('Reg date', 'Выводит дату регистрации пользователя')
@@ -25,7 +24,6 @@ def format_registration_date(reg_datetime):
 
 
 @plugin.on_commands(['датарег', 'reg_date'])
-@chat_only
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     if users:
