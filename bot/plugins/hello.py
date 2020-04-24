@@ -25,7 +25,7 @@ async def _(msg, ctx):
     else:
         user_added, _ = await ctx.mgr.get_or_create(User, id=msg.sender_id)
     chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
-    user_time, user_date = format_registration_date(get_registration_date(user_added.id))
+    user_time, user_date = format_registration_date(await get_registration_date(user_added.id))
     hello_message = "Привет! Я Шаф(еш), и я бот-администратор бесед.\n" \
                     "Помощь по боту - https://vk.com/@shufbot-help\n" \
                     f"Твоя дата регистрации: {user_date}"
