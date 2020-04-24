@@ -1,17 +1,13 @@
 import time
 
-from aiohttp import ClientSession
-
 from bot.plugin import CustomPlugin as Plugin
 from bot.roles import chat_only
 from bot.utils import extract_users
 
 plugin = Plugin('Reg date', 'Выводит дату регистрации пользователя')
 
-session = ClientSession()
 
-
-async def get_registration_date(user_id):
+async def get_registration_date(session, user_id):
     async with session.get("https://vk.com/foaf.php", params=dict(id=user_id)) as response:
         text = await response.text()
         date = text[text.find('<ya:created dc:date="') + 21:]
@@ -36,7 +32,7 @@ async def _(msg, ctx):
         user_id = users[0]
     else:
         user_id = msg.sender_id
-    reg_datetime = await get_registration_date(user_id)
+    reg_datetime = await get_registration_date(ctx.backend.session, user_id)
     user_time, user_date = format_registration_date(reg_datetime)
 
     user_vk = (await ctx.request('users.get', {'user_ids': user_id, 'name_case': 'gen'}))[0]
