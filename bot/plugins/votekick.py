@@ -28,13 +28,13 @@ async def _(msg, ctx):
             (await ctx.mgr.execute(Chat.select().where(Chat.id == msg.receiver_id)))[0].max_votes:
         await ctx.reply(f'За кик [id{user_to_kick.id}|пользователя] проголосовало {count} человек\n'
                         'Пользователь подлежит кику за плохое поведение\n'
-                        'Скажешь что-нибудь напоследок?')
+                        'Скажешь что-нибудь напоследок?', disable_mentions=1)
         await kick_users(ctx, (user_to_kick, chat_user_to_kick), msg.receiver_id - 2 * 10 ** 9)
     elif naive_cache[ctx.chat.id][user_to_kick.id] == 1:
         await ctx.reply(f'Начато голосование за кик [id{user_to_kick.id}|пользователя]\n'
                         f'[id{ctx.user.id}|Другой пользователь] проголосовал за.\n'
                         '1 голос за кик\n'
-                        f'Голосвание продлится примерно {ctx.config["votekick_time"]//60} мин.')
+                        f'Голосвание продлится примерно {ctx.config["votekick_time"]//60} мин.', disable_mentions=1)
         await ctx.app.scheduler.spawn(
             clear_votes(
                 ctx.backend,
@@ -46,13 +46,13 @@ async def _(msg, ctx):
     else:
         await ctx.reply(f'[id{ctx.user.id}|Пользователь] проголосовал за кик '
                         f'[id{user_to_kick.id}|другого пользователя].\n'
-                        f'{count} голосов за кик')
+                        f'{count} голосов за кик', disable_mentions=1)
 
 
 async def clear_votes(backend, chat_id, user_id, sleep_time):
     await asyncio.sleep(sleep_time)
     del naive_cache[chat_id][user_id]
-    await backend.send_message(chat_id, f"Голосоваиние за [id{user_id}|пользователя] прекращено")
+    await backend.send_message(chat_id, f"Голосоваиние за [id{user_id}|пользователя] прекращено", disable_mentions=1)
 
 
 @plugin.on_commands(['setvotekick', 'сетвк'])
