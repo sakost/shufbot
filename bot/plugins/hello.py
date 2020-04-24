@@ -6,6 +6,7 @@ from bot.roles import needed_admin_rights, ChatUserRoles
 from bot.plugin import CustomPlugin
 from bot.db import User, ChatUser
 from bot.plugins.kick import kick_users
+from bot.plugins.reg_date import get_registration_date, format_registration_date
 
 plugin = CustomPlugin('Hello message')
 
@@ -24,8 +25,10 @@ async def _(msg, ctx):
     else:
         user_added, _ = await ctx.mgr.get_or_create(User, id=msg.sender_id)
     chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
-    hello_message = 'КУ!\n'
-    # ctx.request("", ) # todo get a registration date
+    user_time, user_date = format_registration_date(get_registration_date(user_added.id))
+    hello_message = "Привет! Я Шаф(еш), и я бот-администратор бесед.\n" \
+                    "Помощь по боту - https://vk.com/@shufbot-help\n" \
+                    f"Твоя дата регистрации: {user_date}"
     if not chat_user_added.banned:
         await ctx.reply(hello_message)
         return

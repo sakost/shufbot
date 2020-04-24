@@ -21,6 +21,14 @@ async def get_registration_date(user_id):
         return a
 
 
+def format_registration_date(reg_datetime):
+    """
+    :param reg_datetime: a registration datetime structure
+    :return: tuple of (user_time, user_date)
+    """
+    return time.strftime('%H:%M', reg_datetime), time.strftime('%d.%m.%Y', reg_datetime)
+
+
 @plugin.on_commands(['датарег', 'reg_date'])
 @chat_only
 async def _(msg, ctx):
@@ -30,8 +38,7 @@ async def _(msg, ctx):
     else:
         user_id = msg.sender_id
     reg_datetime = await get_registration_date(user_id)
-    user_date = time.strftime('%d.%m.%Y', reg_datetime)
-    user_time = time.strftime('%H:%M', reg_datetime)
+    user_time, user_date = format_registration_date(reg_datetime)
 
     user_vk = (await ctx.request('users.get', {'user_ids': user_id, 'name_case': 'gen'}))[0]
     ctx.reply(f'Страница {user_vk["first_name"]} {user_vk["last_name"]} зарегистрирована {user_date} в {user_time}')
