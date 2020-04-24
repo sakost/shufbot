@@ -20,8 +20,8 @@ async def _(msg, ctx):
     if not users:
         await ctx.reply('Вы не указали пользователя, за которого нужно проголосовать/начать голосование для кика')
         return
-    user_to_kick = await ctx.mgr.get_or_create(User, id=users[0])
-    chat_user_to_kick = await ctx.mgr.get_or_create(ChatUser, user=user_to_kick, chat=ctx.chat)
+    user_to_kick, _ = await ctx.mgr.get_or_create(User, id=users[0])
+    chat_user_to_kick, _ = await ctx.mgr.get_or_create(ChatUser, user=user_to_kick, chat=ctx.chat)
 
     naive_cache[ctx.chat.id][user_to_kick.id] += 1
     if (count := naive_cache[ctx.chat.id][user_to_kick.id]) >= \
