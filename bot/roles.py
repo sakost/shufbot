@@ -6,8 +6,6 @@ from peewee_async import Manager
 from kutana import HandlerResponse
 from kutana.exceptions import RequestException
 
-from bot.db import User, ChatUser
-
 
 class ChatRoles(IntEnum):
     NORMAL = 0
