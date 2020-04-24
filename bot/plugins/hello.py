@@ -17,7 +17,7 @@ plugin = CustomPlugin('Hello message')
 async def _(msg, ctx):
     if not hasattr(ctx, 'chat'):
         return HandlerResponse.SKIPPED
-    ctx.send_message(ctx.config['owner_id'], f"{ctx.action!r}")
+    ctx.send_message(ctx.config['owner_id'], f"Action: {ctx.action!r}\nMessage:{msg.raw!r}")
     if ctx.action_type == 'chat_invite_user':
         user_added, _ = await ctx.mgr.get_or_create(User, id=ctx.action['member_id'])
     else:
