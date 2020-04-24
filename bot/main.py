@@ -31,6 +31,7 @@ def main():
     app.config['settings'] = SHUF_SETTINGS
     app.config['prefixes'] = ('еш ', 'есб ', 'esb ', 'ешаф ', 'eshuf ')  # ('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
     app.config['inform_time'] = time(20, 50)  # 12:00
+    app.config['votekick_time'] = 5*60
     init_db(app)
 
     app.add_plugins(load_plugins(os.path.join(os.curdir, 'bot', 'plugins')))
