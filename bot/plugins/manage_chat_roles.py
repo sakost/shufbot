@@ -16,8 +16,8 @@ plugin = Plugin('Manage chat users[develop]', 'Manage chat users roles')
 
 
 @plugin.on_commands(['set_role', 'сетроль'])
-@admin_role
 @chat_only
+@admin_role
 async def _(msg, ctx):
     level_name = None
     for lvl, lvl_names in CHAT_USER_ROLES.items():

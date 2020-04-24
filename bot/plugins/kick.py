@@ -8,9 +8,9 @@ plugin = Plugin('Kick', 'кикает пользователя из беседы
 
 
 @plugin.on_commands(['бан', 'ban'])
-@needed_admin_rights
-@admin_role
 @chat_only
+@admin_role
+@needed_admin_rights
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     if users:
@@ -20,9 +20,9 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['кик', 'kick'])
-@needed_admin_rights
-@admin_role
 @chat_only
+@admin_role
+@needed_admin_rights
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     if users:

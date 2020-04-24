@@ -115,8 +115,8 @@ def chat_only(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         msg, ctx, *_ = args
-        if not hasattr(ctx, 'chat'):
-            await ctx.reply('Чат не является бесдой')
+        if not hasattr(ctx, 'chat') or not hasattr(ctx, 'chat_user'):
+            await ctx.reply('Чат не является беседой')
             return
         return await func(*args, **kwargs)
     return wrapper

@@ -1,15 +1,15 @@
 from kutana import Plugin, Context
 from kutana.exceptions import RequestException
 
-from bot.db import Chat
+from bot.roles import chat_only
 
 
 plugin = Plugin('Check admin rights', 'Проверяет, есть ли права Администратора у бота')
 
 
 @plugin.on_commands(['чекадм', 'check_access', 'check_admin'])
+@chat_only
 async def _(msg, ctx: Context):
-    mgr = ctx.config['db_manager']
     peer_id = msg.receiver_id
     try:
         await ctx.request('messages.getConversationMembers', peer_id=peer_id)
@@ -19,4 +19,4 @@ async def _(msg, ctx: Context):
     else:
         await ctx.reply('Я админ.. хе-хе')
         ctx.chat.admin = True
-    await mgr.update(ctx.chat)
+    await ctx.mgr.update(ctx.chat)

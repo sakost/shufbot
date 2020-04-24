@@ -9,8 +9,8 @@ plugin = Plugin('Update users', 'обновляет информацию по п
 
 
 @plugin.on_commands(['updusers', 'updchat', 'упдчат', 'упдюзеры', 'update-chat', 'update-users'])
-@needed_admin_rights
 @chat_only
+@needed_admin_rights
 async def _(msg, ctx):
     await update_users(ctx)
     await ctx.reply('Информация об участниках беседы была обновлена')
