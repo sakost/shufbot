@@ -46,4 +46,5 @@ async def _(app: Kutana):
 
 @plugin.on_exception()
 async def _(upd, ctx: Context, exc: Exception):
+    await ctx.reply('Что-то пошло не так...')
     await ctx.send_message(ctx.config['owner_id'], repr(exc))
