@@ -9,7 +9,7 @@ from bot.db import Chat, User, ChatUser
 
 plugin = Plugin('votekick', 'голосует за кик пользователя')
 
-naive_cache = defaultdict(lambda: defaultdict(int))
+naive_cache = defaultdict(lambda: defaultdict(lambda: {'count': 0, 'voted': set()}))
 
 
 @plugin.on_commands(['votekick', 'вотекик'])
@@ -22,9 +22,13 @@ async def _(msg, ctx):
         return
     user_to_kick, _ = await ctx.mgr.get_or_create(User, id=users[0])
     chat_user_to_kick, _ = await ctx.mgr.get_or_create(ChatUser, user=user_to_kick, chat=ctx.chat)
+    if ctx.user.id in naive_cache[ctx.chat.id][user_to_kick]['voted']:
+        await ctx.reply('Вы уже проголосовали за кик этого пользователя!')
+        return
 
     naive_cache[ctx.chat.id][user_to_kick.id] += 1
-    if (count := naive_cache[ctx.chat.id][user_to_kick.id]) >= \
+    naive_cache[ctx.chat.id][user_to_kick.id]['voted'].add(ctx.user.id)
+    if (count := naive_cache[ctx.chat.id][user_to_kick.id]['count']) >= \
             (await ctx.mgr.execute(Chat.select().where(Chat.id == msg.receiver_id)))[0].max_votes:
         await ctx.reply(f'За кик [id{user_to_kick.id}|пользователя] проголосовало {count} человек\n'
                         'Пользователь подлежит кику за плохое поведение\n'
