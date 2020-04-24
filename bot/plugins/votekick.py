@@ -26,7 +26,7 @@ async def _(msg, ctx):
         await ctx.reply('Вы уже проголосовали за кик этого пользователя!')
         return
 
-    naive_cache[ctx.chat.id][user_to_kick.id] += 1
+    naive_cache[ctx.chat.id][user_to_kick.id]['count'] += 1
     naive_cache[ctx.chat.id][user_to_kick.id]['voted'].add(ctx.user.id)
     if (count := naive_cache[ctx.chat.id][user_to_kick.id]['count']) >= \
             (await ctx.mgr.execute(Chat.select().where(Chat.id == msg.receiver_id)))[0].max_votes:
@@ -34,7 +34,7 @@ async def _(msg, ctx):
                         'Пользователь подлежит кику за плохое поведение\n'
                         'Скажешь что-нибудь напоследок?', disable_mentions=1)
         await kick_users(ctx, (user_to_kick, chat_user_to_kick), msg.receiver_id - 2 * 10 ** 9)
-    elif naive_cache[ctx.chat.id][user_to_kick.id] == 1:
+    elif count == 1:
         await ctx.reply(f'Начато голосование за кик [id{user_to_kick.id}|пользователя]\n'
                         f'[id{ctx.user.id}|Другой пользователь] проголосовал за.\n'
                         '1 голос за кик\n'
