@@ -16,6 +16,7 @@ class Chat(peewee.Model):
     max_votes = peewee.IntegerField(default=5)
     level = peewee.IntegerField(default=0)
     not_bot_mention = peewee.BooleanField(default=False)
+    last_user = peewee.ForeignKeyField(ChatUser)
 
     class Meta:
         database = database
@@ -52,6 +53,7 @@ class ChatUser(peewee.Model):
     symbols_np = peewee.IntegerField(default=0)
     voice = peewee.IntegerField(default=0)
     first_appeared = peewee.DateTimeField(default=datetime.datetime.now)
+    last_message = peewee.DateTimeField(default=datetime.datetime.now)
 
     class Meta:
         database = database
