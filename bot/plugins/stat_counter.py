@@ -61,14 +61,14 @@ async def _(msg, ctx):
         first_appeared = user.first_appeared.strptime("%D.%m.%Y")
         last_message = user.last_message.strptime("%D.%M.%Y в %H:%M")
         await ctx.reply(
-            f"Статистика @id{i}:"
-            f"👑 Роль: {role_name}"
-            f"✉ Сообщений: {user.messages} ({user.messages_np})"
-            f"🔣 Символов: {user.symbols} ({user.symbols_np})"
-            f"💬 КПС: {user.messages_np / user.symbols_np}"
-            f"🔈 Голосовых: {user.voice}"
-            f"🏆 Активность: русское место"
-            f"⌛ В чате с {first_appeared}"
-            f"⏳ Последнее сообщение: {last_message}"
-            f"⚠ Предупреждений: {user.warns} из {ctx.chat.max_warns}"
+            f"Статистика @id{i}:\n"
+            f"👑 Роль: {role_name}\n"
+            f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
+            f"🔣 Символов: {user.symbols} ({user.symbols_np})\n"
+            f"💬 КПС: {user.messages_np / user.symbols_np}\n"
+            f"🔈 Голосовых: {user.voice}\n"
+            f"🏆 Активность: русское место\n"
+            f"⌛ В чате с {first_appeared}\n"
+            f"⏳ Последнее сообщение: {last_message}\n"
+            f"⚠ Предупреждений: {user.warns} из {ctx.chat.max_warns}\n"
         )
