@@ -11,15 +11,18 @@ from datetime import datetime
 
 plugin = Plugin('Stat counter')
 
+@plugin.on_any_message(priority=20)
 @chat_only
-@plugin.on_any_message(priority=11)
 async def _(msg, ctx):
     mgr = ctx.mgr
     chat = ctx.chat
     user = ctx.user
     chat_user = ctx.chat_user
-    np = not chat_user.id == chat.last_user.id
-    
+    # if chat.last_user:
+    #    np = not chat_user.id == chat.last_user.id
+    # else:
+    #    np = True
+    np = False
     message_len = len(msg.text)
     
     if np:
@@ -40,15 +43,15 @@ async def _(msg, ctx):
             chat_user.voice += 1
             user.voice += 1
 
-    chat.last_user = chat_user
+    chat.last_user = user
 
     await mgr.update(chat)
     await mgr.update(user)
     await mgr.update(chat_user)
 
 
-@chat_only
 @plugin.on_commands(['стат', 'stat'])
+@chat_only
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     for i in users:

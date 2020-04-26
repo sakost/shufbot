@@ -7,21 +7,6 @@ from peewee_async import MySQLDatabase
 database = MySQLDatabase(None)
 
 
-class Chat(peewee.Model):
-    admin = peewee.BooleanField(default=False)
-    kick_left = peewee.BooleanField(default=False)
-    kick_groups = peewee.BooleanField(default=False)
-    kick_link = peewee.BooleanField(default=True)
-    max_warns = peewee.IntegerField(default=3)
-    max_votes = peewee.IntegerField(default=5)
-    level = peewee.IntegerField(default=0)
-    not_bot_mention = peewee.BooleanField(default=False)
-    last_user = peewee.ForeignKeyField(ChatUser)
-
-    class Meta:
-        database = database
-
-
 class User(peewee.Model):
     id = peewee.IntegerField(unique=True, null=False)
     role = peewee.IntegerField(default=0)
@@ -32,6 +17,21 @@ class User(peewee.Model):
     voice = peewee.IntegerField(default=0)
     first_used = peewee.DateTimeField(default=datetime.datetime.now)
     not_user_mention = peewee.BooleanField(default=False)
+
+    class Meta:
+        database = database
+
+
+class Chat(peewee.Model):
+    admin = peewee.BooleanField(default=False)
+    kick_left = peewee.BooleanField(default=False)
+    kick_groups = peewee.BooleanField(default=False)
+    kick_link = peewee.BooleanField(default=True)
+    max_warns = peewee.IntegerField(default=3)
+    max_votes = peewee.IntegerField(default=5)
+    level = peewee.IntegerField(default=0)
+    not_bot_mention = peewee.BooleanField(default=False)
+    last_user = peewee.ForeignKeyField(User, null=True)
 
     class Meta:
         database = database
@@ -57,9 +57,6 @@ class ChatUser(peewee.Model):
 
     class Meta:
         database = database
-
-    def get_user(self):
-        return self.select(ChatUser, User).join(User).switch(ChatUser)
 
 
 models = [User, Chat, ChatUser]
