@@ -6,7 +6,6 @@ from peewee_async import MySQLDatabase
 
 database = MySQLDatabase(None)
 
-
 class User(peewee.Model):
     id = peewee.IntegerField(unique=True, null=False)
     role = peewee.IntegerField(default=0)

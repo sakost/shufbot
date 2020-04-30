@@ -42,3 +42,12 @@ async def extract_users(msg, ctx):
     users.extend(await extract_users_urls(ctx))
     await asyncio.sleep(0)
     return users
+
+async def get_users(ctx, user_ids, name_case="nom"):
+    if isinstance(user_ids, list):
+        user_ids = ','.join(map(str, user_ids))
+    users = await ctx.request(
+        'users.get',
+        user_ids=user_ids,
+        name_case=name_case)
+    return users

@@ -1,7 +1,7 @@
 import time
 
 from bot.plugin import CustomPlugin as Plugin
-from bot.utils import extract_users
+from bot.utils import extract_users, get_users
 
 plugin = Plugin('Reg date', 'Выводит дату регистрации пользователя')
 
@@ -33,5 +33,5 @@ async def _(msg, ctx):
     reg_datetime = await get_registration_date(ctx.backend.session, user_id)
     user_time, user_date = format_registration_date(reg_datetime)
 
-    user_vk = (await ctx.request('users.get', **{'user_ids': user_id, 'name_case': 'gen'}))[0]
+    user_vk = await get_users(ctx, user_id, 'gen')[0]
     await ctx.reply(f'Страница {user_vk["first_name"]} {user_vk["last_name"]} зарегистрирована {user_date} в {user_time}')

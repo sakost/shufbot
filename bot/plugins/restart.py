@@ -4,6 +4,7 @@ import time
 
 from kutana import Plugin, Context
 
+from bot.utils import get_users
 from bot.roles import developer_global_role
 
 plugin = Plugin('Manage process', '(re)start bot')
@@ -17,7 +18,7 @@ async def _(app):
                 elapsed_time = time.time() - float(sys.argv[2])
                 chat_id = int(sys.argv[3])
                 user_id = int(sys.argv[4])
-                user = (await backend.request('users.get', user_ids=user_id, name_case='ins'))[0]
+                user = (await get_users(ctx, user_id, 'ins'))[0]
                 user_name = user['first_name'] + ' ' + user['last_name']
                 await backend.send_message(chat_id,
                                            f"Бот был перезапущен [id{user_id}|{user_name}] за {elapsed_time:.2f} сек",
