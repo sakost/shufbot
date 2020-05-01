@@ -64,3 +64,17 @@ async def get_names(ctx, users, name_case='', chat=False):
     users_vk = await get_users(ctx, [(i.user_id if chat else i.id) for i in users], name_case)
     names = [f"{i['first_name']} {i['last_name']}" for i in users_vk]
     return ", ".join(names)
+
+COMMANDS = {
+    'on': 1,
+    'off': 0,
+    'вкл': 1,
+    'выкл': 0,
+}
+
+
+def on_or_off(text):
+    for cmd in COMMANDS:
+        if text.startswith(cmd):
+            return COMMANDS[cmd]
+    return None
