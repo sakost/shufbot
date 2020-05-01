@@ -30,7 +30,7 @@ async def _(msg, ctx):
         chat_user.symbols_np += message_len
         chat.messages_np += 1
         chat.symbols_np += message_len
-    
+
     user.messages += 1
     user.symbols += message_len
     chat.messages += 1
@@ -135,7 +135,7 @@ async def _(msg, ctx):
     user_vk = (await get_users(ctx, id, "gen"))[0]
     name = user_vk["first_name"] + " " + user_vk["last_name"]
     await ctx.reply(
-        f"Глобальная статистика {await get_mentioned_text(user, name)}:\n"
+        f"Глобальная статистика {await get_mentioned_text(ctx.user, name)}:\n"
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n"
         f"🔈 Голосовых: {user.voice}\n" +
