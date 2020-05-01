@@ -2,7 +2,7 @@ from kutana import Plugin, Kutana, Update, UpdateType, Context
 from kutana.update import ReceiverType
 from peewee_async import Manager
 
-from bot.db import ChatUser, User, Chat, database
+from bot.db import ChatUser, User, Chat
 from bot.scheduler import init_scheduler
 
 plugin = Plugin('Configure[system]')
@@ -10,8 +10,6 @@ plugin = Plugin('Configure[system]')
 
 async def init_db(app: Kutana):
     app.config['db_manager'] = Manager(app.config['database'], loop=app.get_loop())
-    with app.config['db_manager'].allow_sync():
-        database.evolve(interactive=False)
 
 
 @plugin.on_start()
