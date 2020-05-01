@@ -24,7 +24,7 @@ async def inform(app):
     else:
         next_dt = datetime.combine((datetime.now() + timedelta(days=1)).date(), inform_time)
     await asyncio.sleep(calculate_sleep_time(next_dt))
-    for backend in app.get_backend():
+    for backend in app.get_backends():
         if backend.get_identity() == 'vkontakte':
             mgr: Manager = app.config['db_manager']
             chats = await mgr.execute(Chat.select(Chat.level == ChatRoles.DEVELOPER.value))
