@@ -1,8 +1,4 @@
-from kutana import Message, HandlerResponse
-
 from bot.plugin import CustomPlugin as Plugin
-from bot.plugins.kick import kick_users
-from bot.roles import admin_role, needed_admin_rights, chat_only
 
 plugin = Plugin('Упоминания', 'Тогл упоминаний')
 

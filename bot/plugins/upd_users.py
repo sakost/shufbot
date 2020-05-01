@@ -2,8 +2,8 @@ import asyncio
 
 from kutana import Plugin
 
-from bot.roles import chat_only, needed_admin_rights, ChatUserRoles
 from bot.db import User, ChatUser
+from bot.roles import chat_only, needed_admin_rights, ChatUserRoles
 
 plugin = Plugin('Update users', 'обновляет информацию по пользователям в чате в базу данных')
 

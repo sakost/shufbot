@@ -1,11 +1,11 @@
 import asyncio
 from collections import defaultdict
 
-from bot.roles import chat_only, admin_role, needed_admin_rights
+from bot.db import Chat, User, ChatUser
 from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.kick import kick_users
+from bot.roles import chat_only, admin_role, needed_admin_rights
 from bot.utils import extract_users
-from bot.db import Chat, User, ChatUser
 
 plugin = Plugin('votekick', 'голосует за кик пользователя')
 
@@ -38,7 +38,7 @@ async def _(msg, ctx):
         await ctx.reply(f'Начато голосование за кик [id{user_to_kick.id}|пользователя]\n'
                         f'[id{ctx.user.id}|Другой пользователь] проголосовал за.\n'
                         '1 голос за кик\n'
-                        f'Голосвание продлится примерно {ctx.config["votekick_time"]//60} мин.', disable_mentions=1)
+                        f'Голосвание продлится примерно {ctx.config["votekick_time"] // 60} мин.', disable_mentions=1)
         await ctx.app.scheduler.spawn(
             clear_votes(
                 ctx.backend,

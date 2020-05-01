@@ -28,4 +28,3 @@ class CustomPlugin(Plugin):
             return func
 
         return decorator
-

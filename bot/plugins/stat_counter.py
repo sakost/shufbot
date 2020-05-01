@@ -1,9 +1,12 @@
-import time
+from kutana import HandlerResponse
+
+from datetime import datetime
 
 from kutana import HandlerResponse
 
+from bot.db import ChatUser, User
 from bot.plugin import CustomPlugin as Plugin
-from bot.db import User, ChatUser, Chat
+from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
 from bot.roles import chat_only
 from bot.utils import extract_users, get_users, get_mentioned_text
 from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
@@ -12,6 +15,7 @@ from datetime import datetime
 import re
 
 plugin = Plugin('Stat counter')
+
 
 @plugin.on_any_message(priority=11)
 @chat_only
@@ -23,8 +27,8 @@ async def _(msg, ctx):
     if ctx.user.id < 0:
         return HandlerResponse.SKIPPED
     chat = ctx.chat
-    user = ctx.user #, _ = await ctx.mgr.get_or_create(User, id=ctx.user.id)
-    chat_user = ctx.chat_user # , _ = await ctx.mgr.get_or_create(ChatUser, user_id=ctx.user.id)
+    user = ctx.user
+    chat_user = ctx.chat_user
     np = chat.last_user_id != user.id
     message_len = len(msg.text)
 
@@ -64,16 +68,16 @@ async def _(msg, ctx):
     users = await mgr.execute(
         ChatUser.select().where(
             (ChatUser.user_id > 0) & (ChatUser.chat_id == ctx.chat.id)
-            ).order_by(
-                -ChatUser.messages_np
-                ).limit(10))
-    message = f"Глобальная стата чата.\n"\
-              f"Сообщения: {chat.messages} ({chat.messages_np})\n"\
-              f"Символы: {chat.symbols} ({chat.symbols_np})\n"\
-              f"КПС: " +\
-              (f"{round(chat.symbols_np/chat.messages_np, 2)}\n"
-               if chat.symbols_np else "0.0\n") +\
-              (f"Голосовые: {chat.voice}\n" if chat.voice else "") +\
+        ).order_by(
+            -ChatUser.messages_np
+        ).limit(10))
+    message = f"Глобальная стата чата.\n" \
+              f"Сообщения: {chat.messages} ({chat.messages_np})\n" \
+              f"Символы: {chat.symbols} ({chat.symbols_np})\n" \
+              f"КПС: " + \
+              (f"{round(chat.symbols_np / chat.messages_np, 2)}\n"
+               if chat.symbols_np else "0.0\n") + \
+              (f"Голосовые: {chat.voice}\n" if chat.voice else "") + \
               f"\n"
     template = "{}. [id{}|{} {}] - {} ({})\n"
     users_data = await get_users(ctx, [i.user_id for i in users])
@@ -96,12 +100,12 @@ async def _(msg, ctx):
     users_stat = await ctx.mgr.execute(
         ChatUser.select().where(
             (ChatUser.user_id > 0) & (ChatUser.chat_id == ctx.chat.id)
-            ).order_by(
-                -ChatUser.messages_np
-                ))
+        ).order_by(
+            -ChatUser.messages_np
+        ))
     users_stat = [i.id for i in users_stat]
     if not users:
-        id = ctx.user.id
+        user_id = ctx.user.id
     else:
         id = users[0]
     user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=id, chat_id=ctx.chat.id)
@@ -110,6 +114,9 @@ async def _(msg, ctx):
         if role.value == user.role:
             role_name = CHAT_USER_ROLES[role][0]
             break
+    else:
+        await ctx.reply('Неизвестная роль... ЭТО БАГ, БЕЙТЕ РАЗРАБОВ')
+        return
     first_appeared = user.first_appeared.strftime("%d.%m.%Y")
     last_message = user.last_message.strftime("%d.%m.%Y в %H:%M")
     user_vk = (await get_users(ctx, user.user_id, "gen"))[0]
@@ -121,11 +128,10 @@ async def _(msg, ctx):
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n" +
         (f"🔈 Голосовых: {user.voice}\n" if user.voice else "") +
         f"🏆 Активность: {users_stat.index(user.id) + 1} место\n" +
-        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n"\
-            if user.messages_np else "0.0\n"))
+        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n" if user.messages_np else "0.0\n"))
         + f"⌛ В чате с {first_appeared}\n"
-        f"⏳ Последнее сообщение: {last_message}\n"
-        f"⚠ Предупреждений: {user.warns} из {ctx.chat.max_warns}\n"
+          f"⏳ Последнее сообщение: {last_message}\n"
+          f"⚠ Предупреждений: {user.warns} из {ctx.chat.max_warns}\n"
     )
 
 
@@ -145,6 +151,6 @@ async def _(msg, ctx):
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n"
         f"🔈 Голосовых: {user.voice}\n" +
-        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n"\
-            if user.messages_np else "0.0\n"))
+        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n" \
+                            if user.messages_np else "0.0\n"))
     )

@@ -1,7 +1,7 @@
+import asyncio
 import time
 from datetime import datetime, timedelta
 
-import asyncio
 from aiojobs import create_scheduler
 from peewee_async import Manager
 
@@ -37,4 +37,3 @@ async def inform(app):
 async def init_scheduler(app):
     app.scheduler = await create_scheduler()
     await app.scheduler.spawn(inform(app))
-

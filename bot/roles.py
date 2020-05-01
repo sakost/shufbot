@@ -1,10 +1,9 @@
 from enum import IntEnum, auto
 from functools import wraps
 
-from peewee_async import Manager
-
 from kutana import HandlerResponse
 from kutana.exceptions import RequestException
+from peewee_async import Manager
 
 
 class ChatRoles(IntEnum):
@@ -35,7 +34,9 @@ def restrict_chat_access(level):
             if level.value < ctx.chat.level:
                 return HandlerResponse.SKIPPED
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -48,6 +49,7 @@ def restrict_access(level, global_=False):
     :param level is the Role or ChatRole from this scope
     :param global_ is whether use global settings for user or not. ChatUserRoles for default
     """
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -68,7 +70,9 @@ def restrict_access(level, global_=False):
             if user.role >= level.value:
                 return await func(*args, **kwargs)
             await ctx.reply("У вас недостаточно прав для этой команды!")
+
         return wrapper
+
     return decorator
 
 
@@ -106,6 +110,7 @@ def needed_admin_rights(func):
             if e.error.get('error_code', -1) not in (917, 925, 15):
                 raise
             await ctx.reply('У бота недостаточно прав для этого действия')
+
     return wrapper
 
 
@@ -117,4 +122,5 @@ def chat_only(func):
             await ctx.reply('Чат не является беседой')
             return
         return await func(*args, **kwargs)
+
     return wrapper
