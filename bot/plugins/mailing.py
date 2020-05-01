@@ -39,5 +39,9 @@ async def _(msg, ctx):
         return
     ctx.chat.enabled_mailing = on
     await ctx.mgr.update(ctx.chat)
+    if on:
+        await ctx.reply('В этом чате разрешена рассылка от разработчиков')
+    else:
+        await ctx.reply('В этом чате запрещена рассылка от разработчиков')
 
 
