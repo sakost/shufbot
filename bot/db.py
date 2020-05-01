@@ -31,6 +31,11 @@ class Chat(peewee.Model):
     level = peewee.IntegerField(default=0)
     not_bot_mention = peewee.BooleanField(default=False)
     last_user = peewee.ForeignKeyField(User, null=True)
+    voice = peewee.IntegerField(default=0)
+    messages = peewee.IntegerField(default=0)
+    messages_np = peewee.IntegerField(default=0)
+    symbols = peewee.IntegerField(default=0)
+    symbols_np = peewee.IntegerField(default=0)
 
     class Meta:
         database = database

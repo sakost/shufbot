@@ -28,9 +28,13 @@ async def _(msg, ctx):
         user.symbols_np += message_len
         chat_user.messages_np += 1
         chat_user.symbols_np += message_len
+        chat.messages_np += 1
+        chat.symbols_np += message_len
     
     user.messages += 1
     user.symbols += message_len
+    chat.messages += 1
+    chat.symbols += message_len
     chat_user.messages += 1
     chat_user.symbols += message_len
     chat_user.last_message = datetime.now()
@@ -51,13 +55,21 @@ async def _(msg, ctx):
 @chat_only
 async def _(msg, ctx):
     mgr = ctx.mgr
+    chat = ctx.chat
     users = await mgr.execute(
         ChatUser.select().where(
             (ChatUser.user_id > 0) & (ChatUser.chat_id == ctx.chat.id)
             ).order_by(
                 -ChatUser.messages_np
                 ).limit(10))
-    message = ""
+    message = f"Глобальная стата чата.\n"\
+              f"Сообщения: {chat.messages} ({chat.messages_np})\n"\
+              f"Символы: {chat.symbols} ({chat.symbols_np})\n"\
+              f"КПС: " +\
+              (f"{round(chat.symbols_np/chat.messages_np, 2)}\n"
+               if chat.symbols_np else "0.0\n") +\
+              (f"Голосовые: {chat.voice}\n" if chat.voice else "") +\
+              f"\n"
     template = "{}. [id{}|{} {}] - {} ({})\n"
     users_data = await get_users(ctx, [i.user_id for i in users])
     for i in range(len(users)):
@@ -94,7 +106,7 @@ async def _(msg, ctx):
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n" +
         (f"🔈 Голосовых: {user.voice}\n" if user.voice else "") +
         f"🏆 Активность: русское место\n" +
-        (f"💬 КПС: " + (f"{user.symbols_np / user.messages_np}\n"\
+        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n"\
             if user.messages_np else "0.0\n"))
         + f"⌛ В чате с {first_appeared}\n"
         f"⏳ Последнее сообщение: {last_message}\n"
@@ -116,6 +128,6 @@ async def _(msg, ctx):
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n"
         f"🔈 Голосовых: {user.voice}\n" +
-        (f"💬 КПС: " + (f"{user.symbols_np / user.messages_np}\n"\
+        (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n"\
             if user.messages_np else "0.0\n"))
     )
