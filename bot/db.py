@@ -3,6 +3,7 @@ import datetime
 import peewee
 from peewee_async import MySQLDatabase
 
+import peeweedbevolve
 
 database = MySQLDatabase(None)
 
