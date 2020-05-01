@@ -5,7 +5,7 @@ from kutana import HandlerResponse
 from bot.plugin import CustomPlugin as Plugin
 from bot.db import User, ChatUser, Chat
 from bot.roles import chat_only
-from bot.utils import extract_users, get_users
+from bot.utils import extract_users, get_users, get_mentioned_text
 from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
 from datetime import datetime
 
@@ -106,8 +106,10 @@ async def _(msg, ctx):
             break
     first_appeared = user.first_appeared.strftime("%d.%m.%Y")
     last_message = user.last_message.strftime("%d.%m.%Y в %H:%M")
+    user_vk = (await get_users(ctx, id, "gen"))[0]
+    name = user_vk["first_name"] + " " + user_vk["last_name"]
     await ctx.reply(
-        f"Статистика @id{id}:\n"
+        f"Статистика {await get_mentioned_text(ctx.user, name)}:\n"
         f"👑 Роль: {role_name}\n"
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n" +
@@ -130,8 +132,10 @@ async def _(msg, ctx):
     else:
         id = users[0]
     user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=id)
+    user_vk = (await get_users(ctx, id, "gen"))[0]
+    name = user_vk["first_name"] + " " + user_vk["last_name"]
     await ctx.reply(
-        f"Глобальная статистика @id{id}:\n"
+        f"Глобальная статистика {await get_mentioned_text(user, name)}:\n"
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n"
         f"🔈 Голосовых: {user.voice}\n" +

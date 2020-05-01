@@ -51,3 +51,9 @@ async def get_users(ctx, user_ids, name_case="nom"):
         user_ids=user_ids,
         name_case=name_case)
     return users
+
+async def get_mentioned_text(user, text):
+    if user.mention:
+        return f"[id{user.id}|{text}]"
+    else:
+        return text
