@@ -9,10 +9,7 @@ from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
 from bot.roles import chat_only
 from bot.utils import extract_users, get_users, get_mentioned_text
-from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
-from bot.plugins.kick import kick_users
 from datetime import datetime
-import re
 
 plugin = Plugin('Stat counter')
 
@@ -21,9 +18,6 @@ plugin = Plugin('Stat counter')
 @chat_only(reply=False)
 async def _(msg, ctx):
     mgr = ctx.mgr
-    if ctx.chat.mention_all and re.match(msg.text, "(@all|@online|@everyone)"):
-        
-        return HandlerResponse.SKIPPED
     if ctx.user.id < 0:
         return HandlerResponse.SKIPPED
     chat = ctx.chat
@@ -94,7 +88,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['стат', 'stat'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     users_stat = await ctx.mgr.execute(
@@ -107,15 +101,15 @@ async def _(msg, ctx):
     if not users:
         user_id = ctx.user.id
     else:
-        id = users[0]
-    user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=id, chat_id=ctx.chat.id)
-    global_user, _ = await ctx.mgr.get_or_create(User, id=id)
+        user_id = users[0]
+    user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=user_id, chat_id=ctx.chat.id)
+    global_user, _ = await ctx.mgr.get_or_create(User, id=user_id)
     for role in CHAT_USER_ROLES:
         if role.value == user.role:
             role_name = CHAT_USER_ROLES[role][0]
             break
     else:
-        await ctx.reply('Неизвестная роль... ЭТО БАГ, БЕЙТЕ РАЗРАБОВ')
+        await ctx.reply('Неизвестная роль... ЭТО НЕ БАГ, НЕ БЕЙТЕ РАЗРАБОВ')
         return
     first_appeared = user.first_appeared.strftime("%d.%m.%Y")
     last_message = user.last_message.strftime("%d.%m.%Y в %H:%M")
@@ -136,7 +130,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['глстат', 'glstat', "global"])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     if not users:

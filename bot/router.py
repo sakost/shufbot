@@ -7,6 +7,9 @@ class AnyMessageRouterCustom(AnyMessageRouter):
     def _check_update(self, update, ctx):
         return update.type == UpdateType.MSG
 
+class AnyMessageRouterCustom(AnyMessageRouter):
+    def _check_update(self, update, ctx):
+        return update.type == UpdateType.MSG
 
 class ActionMessageRouter(MapRouter):
     __slots__ = ()
