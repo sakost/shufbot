@@ -28,7 +28,7 @@ async def _(msg, ctx):
             names_kicked = await get_names(ctx, kicked, "", True)
             await ctx.reply(
                 f"{names_kicked} были кикнуты за"
-                " превышение лимита в {ctx.chat.max_warns} варн(-а).")
+                f" превышение лимита в {ctx.chat.max_warns} варн(-а).")
         if warned:
             names_warned = await get_names(ctx, warned, "", True)
             await ctx.reply(
