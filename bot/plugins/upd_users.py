@@ -9,7 +9,7 @@ plugin = Plugin('Update users', 'обновляет информацию по п
 
 
 @plugin.on_commands(['updusers', 'updchat', 'упдчат', 'упдюзеры', 'update-chat', 'update-users'])
-@chat_only
+@chat_only()
 @needed_admin_rights
 async def _(msg, ctx):
     await update_users(ctx)

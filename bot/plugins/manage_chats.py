@@ -12,7 +12,7 @@ CHAT_LEVEL = {
 
 
 @plugin.on_commands(['set_chat_lvl', 'set_chat_level', 'сетчатлвл', 'сетчатлевел'])
-@chat_only
+@chat_only()
 @developer_global_role
 async def _(msg, ctx):
     for lvl, lvl_names in CHAT_LEVEL.items():
@@ -28,6 +28,6 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['чатлвл', 'chat_lvl', 'чатлевел', 'chat_level'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     await ctx.reply(f'Установлен уровень чата "{CHAT_LEVEL[ctx.chat.level][0]}"')

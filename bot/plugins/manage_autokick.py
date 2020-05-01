@@ -9,7 +9,7 @@ plugin = Plugin('Autokick', 'Автокик вышедших')
 
 
 @plugin.on_commands(['автокик', 'autokick'])
-@chat_only
+@chat_only()
 @admin_role
 async def _(msg, ctx):
     if ctx.body:
@@ -22,7 +22,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_message_action('chat_kick_user')
-@chat_only
+@chat_only()
 @needed_admin_rights
 async def _(msg: Message, ctx):
     if not hasattr(ctx, 'chat'):

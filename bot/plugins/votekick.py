@@ -13,7 +13,7 @@ naive_cache = defaultdict(lambda: defaultdict(lambda: {'count': 0, 'voted': set(
 
 
 @plugin.on_commands(['votekick', 'вотекик'])
-@chat_only
+@chat_only()
 @needed_admin_rights
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
