@@ -17,7 +17,7 @@ async def _(msg, ctx):
 
 
 async def update_users(ctx):
-    resp = await ctx.request('messages.getConversationMembers', peer_id=ctx.chat.id)
+    resp = await ctx.request('messages.getConversationMembers', peer_id=2*10**9 + ctx.chat.id)
     for member in resp['items']:
         user, _ = await ctx.mgr.get_or_create(User, id=member['member_id'])
         chat_user, _ = await ctx.mgr.get_or_create(ChatUser, user=user, chat=ctx.chat)

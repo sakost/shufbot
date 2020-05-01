@@ -43,6 +43,7 @@ async def extract_users(msg, ctx):
     await asyncio.sleep(0)
     return users
 
+
 async def get_users(ctx, user_ids, name_case="nom"):
     if isinstance(user_ids, list):
         user_ids = ','.join(map(str, user_ids))
@@ -52,8 +53,15 @@ async def get_users(ctx, user_ids, name_case="nom"):
         name_case=name_case)
     return users
 
+
 async def get_mentioned_text(user, text):
     if user.mention:
         return f"[id{user.id}|{text}]"
     else:
         return text
+
+
+async def get_names(ctx, users, name_case='', chat=False):
+    users_vk = await get_users(ctx, [(i.user_id if chat else i.id) for i in users], name_case)
+    names = [f"{i['first_name']} {i['last_name']}" for i in users_vk]
+    return ", ".join(names)

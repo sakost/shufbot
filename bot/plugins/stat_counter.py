@@ -7,7 +7,9 @@ from bot.db import User, ChatUser, Chat
 from bot.roles import chat_only
 from bot.utils import extract_users, get_users, get_mentioned_text
 from bot.plugins.manage_chat_roles import CHAT_USER_ROLES
+from bot.plugins.kick import kick_users
 from datetime import datetime
+import re
 
 plugin = Plugin('Stat counter')
 
@@ -15,6 +17,9 @@ plugin = Plugin('Stat counter')
 @chat_only
 async def _(msg, ctx):
     mgr = ctx.mgr
+    if ctx.chat.mention_all and re.match(msg.text, "(@all|@online|@everyone)"):
+        
+        return HandlerResponse.SKIPPED
     if ctx.user.id < 0:
         return HandlerResponse.SKIPPED
     chat = ctx.chat
@@ -100,16 +105,17 @@ async def _(msg, ctx):
     else:
         id = users[0]
     user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=id, chat_id=ctx.chat.id)
+    global_user, _ = await ctx.mgr.get_or_create(User, id=id)
     for role in CHAT_USER_ROLES:
-        if role.value == ctx.chat_user.role:
+        if role.value == user.role:
             role_name = CHAT_USER_ROLES[role][0]
             break
     first_appeared = user.first_appeared.strftime("%d.%m.%Y")
     last_message = user.last_message.strftime("%d.%m.%Y в %H:%M")
-    user_vk = (await get_users(ctx, id, "gen"))[0]
+    user_vk = (await get_users(ctx, user.user_id, "gen"))[0]
     name = user_vk["first_name"] + " " + user_vk["last_name"]
     await ctx.reply(
-        f"Статистика {await get_mentioned_text(ctx.user, name)}:\n"
+        f"Статистика {await get_mentioned_text(global_user, name)}:\n"
         f"👑 Роль: {role_name}\n"
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n" +
