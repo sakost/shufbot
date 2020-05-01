@@ -122,7 +122,8 @@ def chat_only(reply=True):
             if not hasattr(ctx, 'chat') or not hasattr(ctx, 'chat_user'):
                 if reply:
                     await ctx.reply('Чат не является беседой')
-                return
+                    return
+                return HandlerResponse.SKIPPED
             return await func(*args, **kwargs)
         return wrapper
     return decorator
