@@ -61,7 +61,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['статчат', 'statchat'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     mgr = ctx.mgr
     chat = ctx.chat
@@ -94,7 +94,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['стат', 'stat'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     users_stat = await ctx.mgr.execute(
@@ -136,7 +136,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['глстат', 'glstat', "global"])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     if not users:
