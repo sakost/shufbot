@@ -30,7 +30,7 @@ async def warn(ctx, user_ids, chat_id, role=-1):
 
 
 @plugin.on_commands(['варн', 'warn'])
-@chat_only
+@chat_only()
 @admin_role
 @needed_admin_rights
 async def _(msg, ctx):

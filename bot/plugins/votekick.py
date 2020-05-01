@@ -60,7 +60,7 @@ async def clear_votes(backend, chat_id, user_id, sleep_time):
 
 
 @plugin.on_commands(['setvotekick', 'сетвк'])
-@chat_only
+@chat_only()
 @needed_admin_rights
 @admin_role
 async def _(msg, ctx):

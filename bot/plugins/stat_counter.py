@@ -55,7 +55,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['статчат', 'statchat'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     mgr = ctx.mgr
     chat = ctx.chat
