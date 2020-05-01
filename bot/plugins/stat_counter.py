@@ -104,6 +104,9 @@ async def _(msg, ctx):
         if role.value == ctx.chat_user.role:
             role_name = CHAT_USER_ROLES[role][0]
             break
+    else:
+        await ctx.reply('Неизвестная роль... ЭТО БАГ, БЕЙТЕ РАЗРАБОВ')
+        return
     first_appeared = user.first_appeared.strftime("%d.%m.%Y")
     last_message = user.last_message.strftime("%d.%m.%Y в %H:%M")
     user_vk = (await get_users(ctx, id, "gen"))[0]
