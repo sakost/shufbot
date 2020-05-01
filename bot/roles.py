@@ -114,13 +114,15 @@ def needed_admin_rights(func):
     return wrapper
 
 
-def chat_only(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        msg, ctx, *_ = args
-        if not hasattr(ctx, 'chat') or not hasattr(ctx, 'chat_user'):
-            await ctx.reply('Чат не является беседой')
-            return
-        return await func(*args, **kwargs)
-
-    return wrapper
+def chat_only(reply=True):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            msg, ctx, *_ = args
+            if not hasattr(ctx, 'chat') or not hasattr(ctx, 'chat_user'):
+                if reply:
+                    await ctx.reply('Чат не является беседой')
+                return
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorator

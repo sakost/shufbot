@@ -28,7 +28,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['set_mail'])
-@chat_only
+@chat_only()
 @creator_role
 async def _(msg, ctx):
     text = ctx.body

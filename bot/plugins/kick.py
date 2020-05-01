@@ -8,7 +8,7 @@ plugin = Plugin('Kick', 'кикает пользователя из беседы
 
 
 @plugin.on_commands(['бан', 'ban'])
-@chat_only
+@chat_only()
 @admin_role
 @needed_admin_rights
 async def _(msg, ctx):
@@ -20,7 +20,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['кик', 'kick'])
-@chat_only
+@chat_only()
 @admin_role
 @needed_admin_rights
 async def _(msg, ctx):

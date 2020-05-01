@@ -7,7 +7,7 @@ plugin = Plugin('Check admin rights', 'Проверяет, есть ли пра�
 
 
 @plugin.on_commands(['чекадм', 'check_access', 'check_admin'])
-@chat_only
+@chat_only()
 async def _(msg, ctx: Context):
     peer_id = msg.receiver_id
     try:

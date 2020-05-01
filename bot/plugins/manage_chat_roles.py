@@ -15,7 +15,7 @@ plugin = Plugin('Manage chat users[develop]', 'Manage chat users roles')
 
 
 @plugin.on_commands(['setrole', 'сетроль'])
-@chat_only
+@chat_only()
 @admin_role
 async def _(msg, ctx):
     level_name = None
@@ -48,7 +48,7 @@ async def _(msg, ctx):
 
 
 @plugin.on_commands(['роль', 'role'])
-@chat_only
+@chat_only()
 async def _(msg, ctx):
     for role in CHAT_USER_ROLES:
         if role.value == ctx.chat_user.role:

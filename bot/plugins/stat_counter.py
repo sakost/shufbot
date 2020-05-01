@@ -14,7 +14,7 @@ plugin = Plugin('Stat counter')
 
 
 @plugin.on_any_message(priority=11)
-@chat_only
+@chat_only(reply=False)
 async def _(msg, ctx):
     mgr = ctx.mgr
     if ctx.user.id < 0:
