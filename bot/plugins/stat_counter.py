@@ -89,7 +89,7 @@ async def _(msg, ctx):
 async def _(msg, ctx):
     users = await extract_users(msg, ctx)
     users_stat = await ctx.mgr.execute(
-        ChatUser.select(ChatUser.id).where(
+        ChatUser.select().where(
             (ChatUser.user_id > 0) & (ChatUser.chat_id == ctx.chat.id)
             ).order_by(
                 -ChatUser.messages_np
@@ -112,7 +112,7 @@ async def _(msg, ctx):
         f"✉ Сообщений: {user.messages} ({user.messages_np})\n"
         f"🔣 Символов: {user.symbols} ({user.symbols_np})\n" +
         (f"🔈 Голосовых: {user.voice}\n" if user.voice else "") +
-        f"🏆 Активность: {users_stat.index(user.id)} место\n" +
+        f"🏆 Активность: {users_stat.index(user.id) + 1} место\n" +
         (f"💬 КПС: " + (f"{round(user.symbols_np / user.messages_np, 2)}\n"\
             if user.messages_np else "0.0\n"))
         + f"⌛ В чате с {first_appeared}\n"
