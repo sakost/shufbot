@@ -15,7 +15,7 @@ class User(peewee.Model):
     symbols_np = peewee.IntegerField(default=0)
     voice = peewee.IntegerField(default=0)
     first_used = peewee.DateTimeField(default=datetime.datetime.now)
-    mention = peewee.BooleanField(default=True, aka="not_user_mention")
+    mention = peewee.BooleanField(default=True)
 
     class Meta:
         database = database
@@ -29,7 +29,7 @@ class Chat(peewee.Model):
     max_warns = peewee.IntegerField(default=3)
     max_votes = peewee.IntegerField(default=5)
     level = peewee.IntegerField(default=0)
-    mention = peewee.BooleanField(default=False, aka="not_bot_mention")
+    mention = peewee.BooleanField(default=False)
     last_user = peewee.ForeignKeyField(User, null=True)
     voice = peewee.IntegerField(default=0)
     messages = peewee.IntegerField(default=0)
