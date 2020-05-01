@@ -107,9 +107,9 @@ async def _(msg, ctx):
     if not users:
         user_id = ctx.user.id
     else:
-        id = users[0]
-    user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=id, chat_id=ctx.chat.id)
-    global_user, _ = await ctx.mgr.get_or_create(User, id=id)
+        user_id = users[0]
+    user, _ = await ctx.mgr.get_or_create(ChatUser, user_id=user_id, chat_id=ctx.chat.id)
+    global_user, _ = await ctx.mgr.get_or_create(User, id=user_id)
     for role in CHAT_USER_ROLES:
         if role.value == user.role:
             role_name = CHAT_USER_ROLES[role][0]
