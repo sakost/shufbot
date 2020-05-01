@@ -1,9 +1,8 @@
 import os
 import time
 
-import psutil
 import aioping
-
+import psutil
 from kutana import Plugin
 
 from bot.roles import developer_global_role
@@ -20,16 +19,16 @@ async def _(msg, ctx):
     answer = ''
     for num, process in enumerate(p):
         answer += f'CPU[{num}]: {process}%\n'
-    answer += f'RAM: {m.percent}% от {int(m.total/(10**9))} GB\n'
+    answer += f'RAM: {m.percent}% от {int(m.total / (10 ** 9))} GB\n'
     try:
-        answer += f"Ping(vk): {(await aioping.ping('vk.com'))*1000:.2f} ms\n"
+        answer += f"Ping(vk): {(await aioping.ping('vk.com')) * 1000:.2f} ms\n"
     except TimeoutError:
         answer += f"Ping(vk): >10sec\n"
     try:
         answer += f"Ping(vk api): {(await aioping.ping('api.vk.com')) * 1000:.2f} ms\n"
     except TimeoutError:
         answer += f"Ping(vk api): >10sec"
-    answer += f"Бот занимает: {cur_process.memory_info().rss / 2**20:.2f}MiB памяти\n"
+    answer += f"Бот занимает: {cur_process.memory_info().rss / 2 ** 20:.2f}MiB памяти\n"
     elapsed_time = int(time.time()) - msg.date
     if elapsed_time > 0:
         answer += f'Прошло {elapsed_time} секунд с момента получения сообщения\n'

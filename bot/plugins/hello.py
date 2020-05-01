@@ -2,17 +2,17 @@ import time
 
 from kutana import HandlerResponse
 
-from bot.roles import needed_admin_rights, ChatUserRoles
-from bot.plugin import CustomPlugin
 from bot.db import User, ChatUser
+from bot.plugin import CustomPlugin
 from bot.plugins.kick import kick_users
 from bot.plugins.reg_date import get_registration_date, format_registration_date
 from bot.plugins.upd_users import update_users
+from bot.roles import needed_admin_rights, ChatUserRoles
 
 plugin = CustomPlugin('Hello message')
 
 hello_message = "Привет! Я Шаф(еш), и я бот-администратор бесед.\n" \
-                    "Помощь по боту - https://vk.com/@shufbot-help\n"
+                "Помощь по боту - https://vk.com/@shufbot-help\n"
 
 
 @plugin.on_message_action('chat_invite_user')

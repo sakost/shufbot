@@ -3,9 +3,8 @@ import datetime
 import peewee
 from peewee_async import MySQLDatabase
 
-import peeweedbevolve
-
 database = MySQLDatabase(None)
+
 
 class User(peewee.Model):
     id = peewee.IntegerField(unique=True, null=False)

@@ -3,15 +3,9 @@ from kutana import Message, HandlerResponse
 from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.kick import kick_users
 from bot.roles import admin_role, needed_admin_rights, chat_only
+from bot.utils import on_or_off
 
 plugin = Plugin('Autokick', 'Автокик вышедших')
-
-COMMANDS = {
-    'on': 1,
-    'off': 0,
-    'вкл': 1,
-    'выкл': 0,
-}
 
 
 @plugin.on_commands(['автокик', 'autokick'])
@@ -20,12 +14,10 @@ COMMANDS = {
 async def _(msg, ctx):
     if ctx.body:
         msg = ctx.body.lower()
-        for cmd in COMMANDS:
-            if msg.startswith(cmd):
-                action = COMMANDS[cmd]
-                ctx.chat.kick_left = bool(action)
-                await ctx.mgr.update(ctx.chat)
-                break
+        action = on_or_off(msg)
+        if action is not None:
+            ctx.chat.kick_left = bool(action)
+            await ctx.mgr.update(ctx.chat)
     await ctx.reply(f'Автокик {"включен" if ctx.chat.kick_left else "выключен"}')
 
 

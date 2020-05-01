@@ -34,4 +34,5 @@ async def _(msg, ctx):
     user_time, user_date = format_registration_date(reg_datetime)
 
     user_vk = (await get_users(ctx, user_id, 'gen'))[0]
-    await ctx.reply(f'Страница {user_vk["first_name"]} {user_vk["last_name"]} зарегистрирована {user_date} в {user_time}')
+    await ctx.reply(
+        f'Страница {user_vk["first_name"]} {user_vk["last_name"]} зарегистрирована {user_date} в {user_time}')

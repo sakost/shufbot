@@ -1,6 +1,5 @@
 from kutana import Plugin, Context, Message
 
-
 plugin = Plugin(name='Аы', description='Напиши мне кто ты и я скажу кто ты')
 
 

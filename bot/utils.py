@@ -1,6 +1,5 @@
-import re
-
 import asyncio
+import re
 
 EXTRACT_USERS_MENTIONED = re.compile(r'\[id(\d*?)\|.*?\]', re.DOTALL)
 EXTRACT_USERS_URLS = re.compile(r'(https?://)?(www\.)?vk\.com/(?P<username>[^\s]+)', re.DOTALL)

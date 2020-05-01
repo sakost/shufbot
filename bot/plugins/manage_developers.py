@@ -1,9 +1,8 @@
 from kutana import Plugin
-
 from peewee_async import Manager
 
-from bot.roles import owner_global_role, UserRoles
 from bot.db import User
+from bot.roles import owner_global_role, UserRoles
 from bot.utils import extract_users
 
 plugin = Plugin('Add developers[develop]')
@@ -55,4 +54,3 @@ async def _(msg, ctx):
             await ctx.reply('Добавлять некого..')
         else:
             await ctx.reply('Удалять некого..')
-

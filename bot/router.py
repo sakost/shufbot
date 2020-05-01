@@ -1,5 +1,5 @@
-from kutana.routers import AnyMessageRouter
 from kutana.router import MapRouter
+from kutana.routers import AnyMessageRouter
 from kutana.update import UpdateType
 
 

@@ -4,8 +4,8 @@ import time
 
 from kutana import Plugin, Context
 
-from bot.utils import get_users
 from bot.roles import developer_global_role
+from bot.utils import get_users
 
 plugin = Plugin('Manage process', '(re)start bot')
 

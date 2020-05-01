@@ -2,8 +2,8 @@ import asyncio
 
 from kutana import Plugin
 
-from bot.roles import developer_global_role
 from bot.plugins.restart import restart_command
+from bot.roles import developer_global_role
 
 plugin = Plugin('Update bot[develop]')
 

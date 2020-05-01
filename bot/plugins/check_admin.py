@@ -3,7 +3,6 @@ from kutana.exceptions import RequestException
 
 from bot.roles import chat_only
 
-
 plugin = Plugin('Check admin rights', 'Проверяет, есть ли права Администратора у бота')
 
 

@@ -2,11 +2,10 @@ import asyncio
 
 from kutana.exceptions import RequestException
 
+from bot.db import Chat
 from bot.plugin import CustomPlugin as Plugin
 from bot.roles import developer_global_role, creator_role, chat_only
-from bot.db import Chat
 from bot.utils import on_or_off
-
 
 plugin = Plugin('Mailing[develop]', 'отправляет рассылку по всем чатам')
 
@@ -43,5 +42,3 @@ async def _(msg, ctx):
         await ctx.reply('В этом чате разрешена рассылка от разработчиков')
     else:
         await ctx.reply('В этом чате запрещена рассылка от разработчиков')
-
-

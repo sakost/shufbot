@@ -1,9 +1,8 @@
 from kutana import Plugin
 
+from bot.db import ChatUser, User
 from bot.roles import admin_role, ChatUserRoles, chat_only, UserRoles
 from bot.utils import extract_users
-from bot.db import ChatUser, User
-
 
 CHAT_USER_ROLES = {
     ChatUserRoles.USER: ('пользователь', 'юзер', 'user'),
@@ -44,7 +43,7 @@ async def _(msg, ctx):
         return
     await ctx.reply('Неизвестный уровень доступа для пользователя. Доступные уровни: \n' + '\n'.join(
         f"{num}){', '.join(lvl_names)}" for num, lvl_names in
-        enumerate(list(CHAT_USER_ROLES.values())[:-1-bool(ctx.chat_user.role != ChatUserRoles.CREATOR.value)], 1)
+        enumerate(list(CHAT_USER_ROLES.values())[:-1 - bool(ctx.chat_user.role != ChatUserRoles.CREATOR.value)], 1)
     ))
 
 
