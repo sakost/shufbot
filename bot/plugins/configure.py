@@ -15,7 +15,7 @@ plugin = Plugin('Configure[system]')
 async def init_db(app: Kutana):
     app.config['db_manager'] = Manager(app.config['database'], loop=app.get_loop())
     with app.config['db_manager'].allow_sync():
-        database.evolve()
+        database.evolve(interactive=False)
 
 
 @plugin.on_start()
