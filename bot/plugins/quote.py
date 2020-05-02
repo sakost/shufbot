@@ -18,10 +18,10 @@ async def _(msg, ctx):
     message = ""
     for i in messages:
         id = i["from_id"]
-        message = i["text"]
+        msg = i["text"]
         if id != last_id:
-            message += users[id]["name"] + ":\n"
-        message += "> " + message + "\n"
+            msg += users[id]["name"] + ":\n"
+        msg += "> " + msg + "\n"
         last_id = i["from_id"]
     await ctx.reply(message)
     
