@@ -12,8 +12,12 @@ from bot.roles import needed_admin_rights, ChatUserRoles
 plugin = CustomPlugin('Hello message')
 
 hello_message = "Привет! Я Шаф(еш), и я бот-администратор бесед.\n" \
-                "Помощь по боту - https://vk.com/@shufbot-help\n"
+                "Помощь по боту - https://vk.com/@shufbot-help\n"\
+                "Твоя дата регистрации: {date_reg}"
+evil_hello_message = "+сосалка\n"\
+                     "сосалка, твоя дата регистрации {date_reg}"
 
+EVIL_CHAT_ID = 4
 
 @plugin.on_message_action('chat_invite_user')
 @plugin.on_message_action('chat_invite_user_by_link')
@@ -31,7 +35,10 @@ async def _(msg, ctx):
         user_added, _ = await ctx.mgr.get_or_create(User, id=msg.sender_id)
     chat_user_added, _ = await ctx.mgr.get_or_create(ChatUser, user=user_added, chat=ctx.chat)
     user_time, user_date = format_registration_date(await get_registration_date(ctx.backend.session, user_added.id))
-    local_hello_message = hello_message + f"Твоя дата регистрации: {user_date}"
+    if ctx.chat.id != EVIL_CHAT_ID:
+        local_hello_message = hello_message.format(date_reg=user_date)
+    else:
+        local_hello_message = evil_hello_message.format(date_reg=user_date)
     if not chat_user_added.banned:
         await ctx.reply(local_hello_message)
         return
