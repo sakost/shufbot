@@ -23,4 +23,5 @@ async def _(msg, ctx):
             message += users[id]["name"] + ":\n"
         message += "> " + message + "\n"
         last_id = i["from_id"]
+    await ctx.reply(message)
     
