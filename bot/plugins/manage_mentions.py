@@ -9,6 +9,7 @@ async def _(msg, ctx):
     if ctx.body:
         msg = ctx.body.lower()
         action = on_or_off(msg)
-        ctx.user.mention = bool(action)
-        await ctx.mgr.update(ctx.user)
+        if action is not None:
+            ctx.user.mention = bool(action)
+            await ctx.mgr.update(ctx.user)
     await ctx.reply(f'Упоминания {"включены" if ctx.user.mention else "выключены"}')
