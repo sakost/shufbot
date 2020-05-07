@@ -1,9 +1,5 @@
 from kutana import HandlerResponse
 
-from datetime import datetime
-
-from kutana import HandlerResponse
-
 from bot.db import ChatUser, User
 from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.manage_chat_roles import CHAT_USER_ROLES

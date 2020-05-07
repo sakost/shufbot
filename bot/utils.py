@@ -53,14 +53,16 @@ async def get_users(ctx, user_ids, name_case="nom", fields=""):
         fields=fields)
     return users
 
+
 async def get_groups(ctx, group_ids, fields=""):
-    if isinstance(group_ids, list):
-        user_ids = ','.join(map(str, group_ids))
+    # if isinstance(group_ids, list):
+    #     user_ids = ','.join(map(str, group_ids))
     users = await ctx.request(
         'groups.getById',
         group_ids=group_ids,
         fields=fields)
     return users
+
 
 async def get_mentioned_text(user, text):
     if user.mention:
@@ -90,7 +92,8 @@ async def get_names(ctx, users, name_case='', chat=False, db=False):
     names += [f"{i['name']}" for i in groups]
     return ", ".join(names)
 
-async def get_avatares_and_names(ctx, users, name_case='', chat=False, db=False):
+
+async def get_avatars_and_names(ctx, users, chat=False, db=False):
     group_ids = list()
     user_ids = list()
     for i in users:
@@ -103,23 +106,24 @@ async def get_avatares_and_names(ctx, users, name_case='', chat=False, db=False)
         else:
             group_ids.append(str(abs(id)))
     users_vk = await get_users(ctx, ','.join(user_ids), "", "photo_100,photo_200,photo_50")
-    groups = await get_groups(ctx,','.join(group_ids), "photo_100,photo_200,photo_50")
+    groups = await get_groups(ctx, ','.join(group_ids), "photo_100,photo_200,photo_50")
     users = {
         i["id"]: {"name": f"{i['first_name']} {i['last_name']}",
-        "avatare": {
-            "photo_50": i["photo_50"],
-            "photo_100": i["photo_100"],
-            "photo_200": i["photo_200"]}} for i in users_vk}
+                  "avatar": {
+                      "photo_50": i["photo_50"],
+                      "photo_100": i["photo_100"],
+                      "photo_200": i["photo_200"]}} for i in users_vk}
     groups = {
         -i["id"]: {"name": f"{i['name']}",
-        "avatare": {
-            "photo_50": i["photo_50"],
-            "photo_100": i["photo_100"],
-            "photo_200": i["photo_200"]}} for i in groups}
+                   "avatar": {
+                       "photo_50": i["photo_50"],
+                       "photo_100": i["photo_100"],
+                       "photo_200": i["photo_200"]}} for i in groups}
     users.update(groups)
     return users
 
-async def extract_mesasges(msg, ctx):
+
+async def extract_messages(msg, ctx):
     messages = []
     raw_msg = msg.raw['object']['message']
     reply_msg = raw_msg.get('reply_message', None)
@@ -131,6 +135,7 @@ async def extract_mesasges(msg, ctx):
     for fwd_msg in fwd_messages:
         messages.append({"from_id": fwd_msg['from_id'], "text": fwd_msg["text"]})
     return messages
+
 
 COMMANDS = {
     'on': 1,
@@ -144,4 +149,3 @@ def on_or_off(text):
     for cmd in COMMANDS:
         if text.startswith(cmd):
             return COMMANDS[cmd]
-    return None
