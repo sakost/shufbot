@@ -27,12 +27,12 @@ async def _(msg, ctx):
         kicked, warned = await warn(
             ctx, ctx.user.id, ctx.chat.id, ChatUserRoles.VIP_USER.value)
         if kicked:
-            names_kicked = await get_names(ctx, kicked, "", True)
+            names_kicked = await get_names(ctx, kicked, "", True, True)
             await ctx.reply(
                 f"{names_kicked} были кикнуты за"
                 f" превышение лимита в {ctx.chat.max_warns} варн(-а).")
         if warned:
-            names_warned = await get_names(ctx, warned, "", True)
+            names_warned = await get_names(ctx, warned, "", True, True)
             await ctx.reply(
                 f"{names_warned} был выдан варн за упоминание всех"
                 " участников.")
