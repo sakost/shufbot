@@ -105,7 +105,7 @@ async def get_avatares_and_names(ctx, users, name_case='', chat=False, db=False)
     users_vk = await get_users(ctx, ','.join(user_ids), "", "photo_100,photo_200,photo_50")
     groups = await get_groups(ctx,','.join(group_ids), "photo_100,photo_200,photo_50")
     users = {
-        i["id"]: {"name": f"{i['first_name']} {i['last_name']}",
+        int(i["id"]): {"name": f"{i['first_name']} {i['last_name']}",
         "avatare": {
             "photo_50": i["photo_50"],
             "photo_100": i["photo_100"],
@@ -130,6 +130,7 @@ async def extract_mesasges(msg, ctx):
 
     for fwd_msg in fwd_messages:
         messages.append({"from_id": fwd_msg['from_id'], "text": fwd_msg["text"]})
+
     return messages
 
 COMMANDS = {

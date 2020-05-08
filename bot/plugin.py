@@ -26,5 +26,4 @@ class CustomPlugin(Plugin):
                 Handler(func, group_state, user_state, priority),
             )
             return func
-
         return decorator
