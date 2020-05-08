@@ -3,7 +3,7 @@ import asyncio
 from kutana import Plugin
 
 from bot.db import User, ChatUser
-from bot.roles import chat_only, needed_admin_rights, ChatUserRoles
+from bot.roles import chat_only, needed_admin_rights, ChatUserRoles, creator_role
 
 plugin = Plugin('Update users', 'обновляет информацию по пользователям в чате в базу данных')
 
@@ -11,6 +11,7 @@ plugin = Plugin('Update users', 'обновляет информацию по п
 @plugin.on_commands(['updusers', 'updchat', 'упдчат', 'упдюзеры', 'update-chat', 'update-users'])
 @chat_only()
 @needed_admin_rights
+@creator_role
 async def _(msg, ctx):
     await update_users(ctx)
     await ctx.reply('Информация об участниках беседы была обновлена')

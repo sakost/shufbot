@@ -4,6 +4,7 @@ from peewee_async import Manager
 
 from bot.db import ChatUser, User, Chat
 from bot.scheduler import init_scheduler
+from bot.roles import ChatRoles
 
 plugin = Plugin('Configure[system]')
 
@@ -44,4 +45,7 @@ async def _(app: Kutana):
 @plugin.on_exception()
 async def _(upd, ctx: Context, exc: Exception):
     await ctx.reply('Что-то пошло не так...')
-    await ctx.send_message(ctx.config['owner_id'], repr(exc))
+    if ctx.chat.level >= ChatRoles.DEVELOPER:
+        await ctx.reply(repr(exc))
+    else:
+        await ctx.send_message(ctx.config['owner_id'], repr(exc))

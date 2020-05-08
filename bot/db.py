@@ -40,7 +40,6 @@ class Chat(peewee.Model):
     symbols_np = peewee.IntegerField(default=0)
     enabled_mailing = peewee.BooleanField(default=True)
 
-
     class Meta:
         database = database
 

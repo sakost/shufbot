@@ -1,6 +1,6 @@
 from kutana import Plugin
 
-# from bot.utils import get_avatares_and_names, extract_mesasges
+from bot.utils import get_avatars_and_names, extract_messages
 from PIL import Image, ImageColor
 plugin = Plugin('Цитата', 'Создает цитату из сообщений')
 
@@ -31,21 +31,18 @@ def make_citate(users, messages):
 
 @plugin.on_commands(['цит', 'quote'])
 async def _(msg, ctx):
-    messages = await extract_mesasges(msg, ctx)
+    messages = await extract_messages(msg, ctx)
     if not messages:
         await ctx.reply('Вы не указали сообщения для цитаты')
     user_ids = [i["from_id"] for i in messages]
-    users = await get_avatares_and_names(ctx, user_ids)
-    import json
-    json.dump(
-        {"users": users,
-         "messages": messages
-         }, open("quote.json", "w"), indent=4, sort_keys=True)
-    print(make_citate(users, messages))
-
-if __name__ == "__main__":
-    import json
-    data = json.load(open("quote.json", "r"))
-    messages = data.get("messages")
-    users = data.get("users")
-    print(make_citate(users, messages))
+    users = await get_avatars_and_names(ctx, user_ids)
+    last_id = 0
+    message = ""
+    for i in messages:
+        id = i["from_id"]
+        msg = i["text"]
+        if id != last_id:
+            message += users[id]["name"] + ":\n"
+        message += "> " + msg + "\n"
+        last_id = i["from_id"]
+    await ctx.reply(message)
