@@ -4,6 +4,7 @@ from bot.utils import get_avatars_and_names, extract_messages
 from PIL import Image, ImageColor, ImageDraw, ImageFont
 from random import randint
 import re
+import os
 
 plugin = Plugin('Цитата', 'Создает цитату из сообщений')
 
@@ -67,7 +68,7 @@ def make_mono_quote(users, message):
         return False
     msg = wrap(x, msg, WIDTH - INDENT, text_font)
     quote = Image.open("assets/quotes.jpg").convert("RGB")
-    name = wrap(x, users[id]["name"], WIDTH - quote.width, name_font)
+    name = wrap(x, users[id]["name"], WIDTH - quote.width - 80, name_font)
 
     bg_rgb = ImageColor.getrgb(BG_COLOR)
     cr_rgb = ImageColor.getrgb(CR_COLOR)
@@ -96,6 +97,8 @@ def make_mono_quote(users, message):
     y += text_size[1] + 34
     draw.multiline_text((x, y), COPYRIGHT, font=text_font, fill=cr_rgb)
     filename = f"quotes/monoQuote{randint(0, 9999999)}.png"
+    if not os.path.exists("quotes"):
+        os.mkdir("quotes")
     img.save(filename, "PNG")
     return filename
 
@@ -114,6 +117,7 @@ async def _(msg, ctx):
             return
         attach = Attachment.new(open(filename, "rb"))
         attachment = await ctx.backend.upload_attachment(
-            attach, peer_id=ctx.chat.id + 2*10**9)
+            attach, peer_id=msg.receiver_id)
+        os.remove(filename)
     message = "Сделал цитату."
     await ctx.reply(message, attachments=attachment)
