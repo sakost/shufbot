@@ -27,7 +27,7 @@ EMOJI_PATTERN = re.compile('[\U00010000-\U0010ffff]', flags=re.UNICODE)
 def wrap(x, text, borderx, font):
     lines = []
     line = []
-    words = text.split()
+    words = text.split(" ")
     for word in words:
         line_words = line + [word]
         new_line = ' '.join(line_words)
@@ -58,12 +58,17 @@ def wrap(x, text, borderx, font):
     return '\n'.join(lines)
 
 
-def make_mono_quote(users, message):
+def make_mono_quote(users, messages):
     x = INDENT
     y = 96
-
-    id = message["from_id"]
-    msg = EMOJI_PATTERN.sub('', message["text"])
+    id = messages[0]["from_id"]
+    msg = ""
+    for i in messages:
+        if i["from_id"] == id:
+            t = EMOJI_PATTERN.sub('', i["text"])
+            if t:
+                msg += i["text"] + "\n"
+    msg = EMOJI_PATTERN.sub('', msg)
     if not msg:
         return False
     msg = wrap(x, msg, WIDTH - INDENT, text_font)
@@ -93,7 +98,7 @@ def make_mono_quote(users, message):
         name, font=name_font, fill=fg_rgb)
     y += name_size[1] + 42
     x += 2
-    draw.multiline_text((x, y), msg, font=text_font, fill=fg_rgb)
+    draw.multiline_text((x, y), msg, font=text_font, fill=fg_rgb, spacing=10)
     y += text_size[1] + 34
     draw.multiline_text((x, y), COPYRIGHT, font=text_font, fill=cr_rgb)
     filename = f"quotes/monoQuote{randint(0, 9999999)}.png"
@@ -108,10 +113,10 @@ async def _(msg, ctx):
     messages = await extract_messages(msg, ctx)
     if not messages:
         await ctx.reply('Вы не указали сообщения для цитаты')
-    user_ids = [i["from_id"] for i in messages]
-    users = await get_avatars_and_names(ctx, user_ids)
-    if len(messages) == 1:
-        filename = make_mono_quote(users, messages[0])
+    else:
+        user_ids = [i["from_id"] for i in messages]
+        users = await get_avatars_and_names(ctx, user_ids)
+        filename = make_mono_quote(users, messages)
         if not filename:
             await ctx.reply("Текста не найдено")
             return
@@ -119,5 +124,5 @@ async def _(msg, ctx):
         attachment = await ctx.backend.upload_attachment(
             attach, peer_id=msg.receiver_id)
         os.remove(filename)
-    message = "Сделал цитату."
-    await ctx.reply(message, attachments=attachment)
+        message = ""
+        await ctx.reply(message, attachments=attachment)
