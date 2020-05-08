@@ -16,6 +16,8 @@ FONT_SIZE = 45
 NAME_FONT_SIZE = 80
 INDENT = 80
 COPYRIGHT = "Цитата сделана vk.com/shufbot"
+LINE_INDENT = 15
+
 name_font = ImageFont.truetype("assets/Roboto-Bold.ttf",
                                size=NAME_FONT_SIZE,
                                encoding="unic")
@@ -27,7 +29,11 @@ EMOJI_PATTERN = re.compile('[\U00010000-\U0010ffff]', flags=re.UNICODE)
 def wrap(x, text, borderx, font):
     lines = []
     line = []
+    expanded = False
     words = text.split(" ")
+    if len(words) > 80:
+        expanded = True
+        borderx += 260
     for word in words:
         line_words = line + [word]
         new_line = ' '.join(line_words)
@@ -55,41 +61,47 @@ def wrap(x, text, borderx, font):
     if line:
         lines.append(line)
     lines = [' '.join(line) for line in lines if line]
-    return '\n'.join(lines)
+    return '\n'.join(lines), expanded
 
 
 def make_mono_quote(users, messages):
+    width = WIDTH
+    line_indent = LINE_INDENT
     x = INDENT
     y = 96
     id = messages[0]["from_id"]
-    msg = ""
+    msg = list()
     for i in messages:
         if i["from_id"] == id:
             t = EMOJI_PATTERN.sub('', i["text"])
             if t:
-                msg += i["text"] + "\n"
-    msg = EMOJI_PATTERN.sub('', msg)
+                msg.append(t)
     if not msg:
         return False
-    msg = wrap(x, msg, WIDTH - INDENT, text_font)
+    msg = "\n".join(msg)
+    msg, expanded = wrap(x, msg, WIDTH - INDENT, text_font)
     quote = Image.open("assets/quotes.jpg").convert("RGB")
-    name = wrap(x, users[id]["name"], WIDTH - quote.width - 80, name_font)
+    name, _ = wrap(x, users[id]["name"], WIDTH - quote.width - 80, name_font)
 
+    if expanded:
+        width += 260
+        line_indent = 20
     bg_rgb = ImageColor.getrgb(BG_COLOR)
     cr_rgb = ImageColor.getrgb(CR_COLOR)
     fg_rgb = ImageColor.getrgb(FG_COLOR)
 
-    img = Image.new("RGB", (WIDTH, 1000), bg_rgb)
+    img = Image.new("RGB", (width, 1000), bg_rgb)
     draw = ImageDraw.Draw(img)
 
     name_size = draw.multiline_textsize(name, name_font)
-    line_name_size = draw.multiline_textsize(name.splitlines()[0], name_font)
-    text_size = draw.multiline_textsize(msg, text_font)
+    line_name_size = draw.multiline_textsize(
+        name.splitlines()[0], name_font)
+    text_size = draw.multiline_textsize(msg, text_font, spacing=line_indent)
     copyright_size = draw.multiline_textsize(COPYRIGHT, text_font)
     height = y + name_size[1] + text_size[1]\
-        + copyright_size[1] + INDENT + 42+34
+        + copyright_size[1] + INDENT + 42 + 34 + 2
 
-    img = Image.new("RGB", (WIDTH, height), bg_rgb)
+    img = Image.new("RGB", (width, height), bg_rgb)
     img.paste(quote, (img.width - quote.width - 80, 0))
     draw = ImageDraw.Draw(img)
 
@@ -98,7 +110,8 @@ def make_mono_quote(users, messages):
         name, font=name_font, fill=fg_rgb)
     y += name_size[1] + 42
     x += 2
-    draw.multiline_text((x, y), msg, font=text_font, fill=fg_rgb, spacing=10)
+    draw.multiline_text(
+        (x, y), msg, font=text_font, fill=fg_rgb, spacing=line_indent)
     y += text_size[1] + 34
     draw.multiline_text((x, y), COPYRIGHT, font=text_font, fill=cr_rgb)
     filename = f"quotes/monoQuote{randint(0, 9999999)}.png"
