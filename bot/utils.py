@@ -1,5 +1,6 @@
 import asyncio
 import re
+import aiohttp
 
 EXTRACT_USERS_MENTIONED = re.compile(r'\[id(\d*?)\|.*?\]', re.DOTALL)
 EXTRACT_USERS_URLS = re.compile(
@@ -144,6 +145,16 @@ async def extract_messages(msg, ctx):
 
     return messages
 
+
+async def download_images(images):
+    downloaded = dict()
+    session = aiohttp.ClientSession()
+    for i in images:
+        await asyncio.sleep(0)
+        async with session.request("get", i) as response:
+            downloaded.setdefault(i, await response.content.read())
+    await session.close()
+    return downloaded
 
 COMMANDS = {
     'on': 1,

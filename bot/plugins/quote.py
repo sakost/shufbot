@@ -1,51 +1,42 @@
 from kutana import Plugin, Attachment
 
-from bot.utils import get_avatars_and_names, extract_messages
+from bot.utils import get_avatars_and_names, extract_messages, download_images
 from PIL import Image, ImageColor, ImageDraw, ImageFont
-from random import randint
+from io import BytesIO
+
 import re
-import os
+import asyncio
 
 plugin = Plugin('Цитата', 'Создает цитату из сообщений')
 
-BG_COLOR = "#191919"
-CR_COLOR = "#494949"
-FG_COLOR = "#ffffff"
-WIDTH = 1000
-FONT_SIZE = 45
-NAME_FONT_SIZE = 80
-INDENT = 80
 COPYRIGHT = "Цитата сделана vk.com/shufbot"
-LINE_INDENT = 15
 
-name_font = ImageFont.truetype("assets/Roboto-Bold.ttf",
-                               size=NAME_FONT_SIZE,
-                               encoding="unic")
-text_font = ImageFont.truetype("assets/Roboto-Regular.ttf", size=FONT_SIZE,
-                               encoding="unic")
 EMOJI_PATTERN = re.compile('[\U00010000-\U0010ffff]', flags=re.UNICODE)
 
 
-def wrap(x, text, borderx, font):
+def wrap(x, text, border, font, width=1000, max_width=1000, auto_expand=False):
     lines = []
     line = []
-    expanded = False
     words = text.split(" ")
-    if len(words) > 80:
-        expanded = True
-        borderx += 260
+    if len(words) > 80 and not auto_expand:
+        width += 260
     for word in words:
         line_words = line + [word]
         new_line = ' '.join(line_words)
         size = font.getsize(new_line)
-        if x + size[0] <= borderx:
+        if x + size[0] <= width + border:
             line.append(word)
         else:
+            if size[0] > width and auto_expand:
+                if size[0] < max_width:
+                    width = size[0]
+                else:
+                    width = 1000
             if len(line_words) == 1:
                 tword = ""
                 n = 0
                 size = (0, 0)
-                while x + size[0] <= borderx:
+                while x + size[0] <= width + border:
                     tword += word[n]
                     size = font.getsize(tword)
                     n += 1
@@ -61,64 +52,231 @@ def wrap(x, text, borderx, font):
     if line:
         lines.append(line)
     lines = [' '.join(line) for line in lines if line]
-    return '\n'.join(lines), expanded
+    return '\n'.join(lines), width
 
 
-def make_mono_quote(users, messages):
-    width = WIDTH
-    line_indent = LINE_INDENT
-    x = INDENT
+async def get_actions(users, messages, x, width, name_font,
+                      text_font, text_border=-40,
+                      name_border=-40, fixed_id=None,
+                      extend=False, max_width=1000):
+    actions = list()
+    if fixed_id:
+        id = fixed_id
+    else:
+        id = 0
+    avatars = set()
+    wrapped_names = dict()
+    t_msg = list()
+    expanded = False
+    if fixed_id:
+        name, _expanded = wrap(
+            x, users[id]["name"], name_border, name_font, width)
+        wrapped_names.setdefault(id, name)
+        actions.append({"avatar": users[id]["avatar"],
+                        "name": name,
+                        "type": "title"})
+        avatars.add(users[id]["avatar"]["photo_100"])
+
+    for msg in messages:
+        clean_msg = EMOJI_PATTERN.sub('', msg["text"])
+        if clean_msg:
+            if msg["from_id"] != id and not fixed_id:
+                wrapped_msg, _expanded = wrap(x, "\n".join(t_msg),
+                                              text_border, text_font,
+                                              width, max_width,
+                                              extend)
+                if _expanded:
+                    expanded = _expanded
+                if id != 0:
+                    actions.append({"type": "message",
+                                    "message": "\n".join(wrap)})
+                id = msg["from_id"]
+                t_msg = list()
+                if wrapped_names.get(id):
+                    name = wrapped_names[id]
+                else:
+                    name, _expanded = wrap(
+                        x, users[id]["name"], name_border, name_font, width)
+                    wrapped_names.setdefault(id, name)
+                actions.append({"avatar": users[id]["avatar"],
+                                "name": name,
+                                "type": "title"})
+                avatars.add(users[id]["avatar"]["photo_100"])
+
+            t_msg.append(msg["text"])
+
+    wrapped_msg, _expanded = wrap(x, "\n".join(t_msg),
+                                  text_border, text_font,
+                                  width, max_width, extend)
+    if _expanded:
+        expanded = _expanded
+    actions.append({"type": "message",
+                    "message": wrapped_msg})
+    if not actions:
+        return False
+    return actions, expanded, avatars
+
+
+def get_mono_quote(xy, actions, quote, draw,
+                   fg_rgb, cr_rgb, name_font, text_font,
+                   line_indent, real_draw=True):
+    x, y = xy
+    for i in actions:
+        if i["type"] == "title":
+            name = i["name"]
+            line = name.splitlines()[0]
+            size = draw.multiline_textsize(line, name_font)
+            if real_draw:
+                draw.multiline_text((x, quote.height - size[1]), name,
+                                    fg_rgb, name_font)
+            x += 2
+            y += size[1] + 42
+        elif i["type"] == "message":
+            size = draw.multiline_textsize(i["message"],
+                                           text_font, spacing=line_indent)
+            if real_draw:
+                draw.multiline_text(
+                    (x, y), i["message"], font=text_font,
+                    fill=fg_rgb, spacing=line_indent)
+            y += size[1] + 34
+    size = draw.multiline_textsize(COPYRIGHT, text_font)
+    draw.multiline_text((x, y), COPYRIGHT, cr_rgb, text_font)
+    y += 80 + size[1]
+    return y
+
+
+async def make_mono_quote(users, messages):
+    name_font = ImageFont.truetype("assets/Roboto-Bold.ttf",
+                                   size=80,
+                                   encoding="unic")
+    text_font = ImageFont.truetype("assets/Roboto-Regular.ttf", size=45,
+                                   encoding="unic")
+
+    bg_rgb = ImageColor.getrgb("#191919")
+    cr_rgb = ImageColor.getrgb("#494949")
+    fg_rgb = ImageColor.getrgb("#ffffff")
+
+    width = 1000
+    line_indent = 15
+    x = 80
     y = 96
     id = messages[0]["from_id"]
-    msg = list()
-    for i in messages:
-        if i["from_id"] == id:
-            t = EMOJI_PATTERN.sub('', i["text"])
-            if t:
-                msg.append(t)
-    if not msg:
-        return False
-    msg = "\n".join(msg)
-    msg, expanded = wrap(x, msg, WIDTH - INDENT, text_font)
+
     quote = Image.open("assets/quotes.jpg").convert("RGB")
-    name, _ = wrap(x, users[id]["name"], WIDTH - quote.width - 80, name_font)
+    actions, expanded, _ = await get_actions(
+        users, messages, x, width, name_font, text_font,
+        -80, -(quote.width - 80), id)
+    if not actions:
+        return False
 
-    if expanded:
-        width += 260
+    if expanded != width:
+        width = expanded
         line_indent = 20
-    bg_rgb = ImageColor.getrgb(BG_COLOR)
-    cr_rgb = ImageColor.getrgb(CR_COLOR)
-    fg_rgb = ImageColor.getrgb(FG_COLOR)
-
-    img = Image.new("RGB", (width, 1000), bg_rgb)
-    draw = ImageDraw.Draw(img)
-
-    name_size = draw.multiline_textsize(name, name_font)
-    line_name_size = draw.multiline_textsize(
-        name.splitlines()[0], name_font)
-    text_size = draw.multiline_textsize(msg, text_font, spacing=line_indent)
-    copyright_size = draw.multiline_textsize(COPYRIGHT, text_font)
-    height = y + name_size[1] + text_size[1]\
-        + copyright_size[1] + INDENT + 42 + 34 + 2
+    draw = ImageDraw.ImageDraw(Image.new("RGB", (1000, 1000)))
+    height = get_mono_quote((x, y), actions, quote, draw,
+                            fg_rgb, cr_rgb, name_font, text_font, line_indent,
+                            False)
 
     img = Image.new("RGB", (width, height), bg_rgb)
+    draw = ImageDraw.Draw(img)
     img.paste(quote, (img.width - quote.width - 80, 0))
     draw = ImageDraw.Draw(img)
+    get_mono_quote((x, y), actions, quote, draw,
+                   fg_rgb, cr_rgb, name_font, text_font, line_indent,
+                   True)
+    file = BytesIO()
+    img.save(file, "PNG")
+    file.seek(0)
+    return file
 
-    draw.multiline_text(
-        (x, quote.height - line_name_size[1]),
-        name, font=name_font, fill=fg_rgb)
-    y += name_size[1] + 42
-    x += 2
-    draw.multiline_text(
-        (x, y), msg, font=text_font, fill=fg_rgb, spacing=line_indent)
-    y += text_size[1] + 34
-    draw.multiline_text((x, y), COPYRIGHT, font=text_font, fill=cr_rgb)
-    filename = f"quotes/monoQuote{randint(0, 9999999)}.png"
-    if not os.path.exists("quotes"):
-        os.mkdir("quotes")
-    img.save(filename, "PNG")
-    return filename
+
+async def make_alternate_quote(users, messages):
+    name_font = ImageFont.truetype("assets/Roboto-Bold.ttf",
+                                   size=34,
+                                   encoding="unic")
+    text_font = ImageFont.truetype("assets/Roboto-Regular.ttf", size=36,
+                                   encoding="unic")
+
+    width = 600
+    line_indent = 12
+    x = 40 + 100 + 26
+    y = 40
+
+    actions = list()
+    id = 0
+    expanded = False
+    avatars = set()
+    wrapped_names = dict()
+    t_msg = list()
+    for msg in messages:
+        t = EMOJI_PATTERN.sub('', msg["text"])
+        if t:
+            if msg["from_id"] != id:
+                if id != 0:
+                    actions.append({"type": "message",
+                                    "message": "\n".join(t_msg)})
+                t_msg = list()
+                id = msg["from_id"]
+                if wrapped_names.get(id):
+                    name = wrapped_names[id]
+                else:
+                    name, _ = wrap(
+                        x, users[id]["name"], -40, name_font)
+                    wrapped_names.setdefault(id, name)
+                actions.append({"avatar": users[id]["avatar"],
+                                "name": name,
+                                "type": "title"})
+                avatars.add(users[id]["avatar"]["photo_100"])
+            t, _expanded = wrap(x, msg["text"], -40, text_font)
+            if _expanded:
+                expanded = _expanded
+            t_msg.append(t)
+
+    actions.append({"type": "message",
+                    "message": "\n".join(t_msg)})
+    if not actions:
+        return False
+
+    avatars = await download_images(avatars)
+    if expanded:
+        width = expanded
+
+    bg_rgb = ImageColor.getrgb("#ffffff")
+    fg_rgb = ImageColor.getrgb("#000000")
+    n_rgb = ImageColor.getrgb("#466383")
+
+    img = Image.new("RGBA", (width, 1000), bg_rgb)
+    draw = ImageDraw.Draw(img)
+    x = 40
+    start = True
+    for i in actions:
+        if i.get("type") == "title":
+            x = 40
+            if not start:
+                y += 20
+            else:
+                start = False
+            ava = Image.open(BytesIO(avatars[i["avatar"]["photo_100"]]))
+            mask = Image.open(open("assets/mask.png", "rb")).convert("RGBA")
+            img.paste(ava, (x, y))
+            img.alpha_composite(mask, (x, y))
+            x += ava.width + 25
+            y += 7
+            size = draw.multiline_textsize(i["name"], name_font)
+            draw.multiline_text((x, y), i["name"], font=name_font, fill=n_rgb)
+            y += size[1] + 12
+        elif i.get("type") == "message":
+            x = 40 + 100 + 25
+            size = draw.multiline_textsize(i["message"], font=text_font,
+                                           spacing=line_indent)
+            draw.multiline_text((x, y), i["message"],
+                                font=text_font, fill=fg_rgb,
+                                spacing=line_indent)
+            y += size[1]
+    file = BytesIO()
+    img.save(file, "PNG")
+    file.seek(0)
+    return file
 
 
 @plugin.on_commands(['цит', 'quote'])
@@ -129,13 +287,33 @@ async def _(msg, ctx):
     else:
         user_ids = [i["from_id"] for i in messages]
         users = await get_avatars_and_names(ctx, user_ids)
-        filename = make_mono_quote(users, messages)
-        if not filename:
+        await asyncio.sleep(0)  # заставляем роботать другие процессы
+        file = await make_mono_quote(users, messages)
+        if not file:
             await ctx.reply("Текста не найдено")
             return
-        attach = Attachment.new(open(filename, "rb"))
+        attach = Attachment.new(file)
         attachment = await ctx.backend.upload_attachment(
             attach, peer_id=msg.receiver_id)
-        os.remove(filename)
+        message = ""
+        await ctx.reply(message, attachments=attachment)
+
+
+@plugin.on_commands(['альтцит', 'altquote'])
+async def _(msg, ctx):
+    messages = await extract_messages(msg, ctx)
+    if not messages:
+        await ctx.reply('Вы не указали сообщения для цитаты')
+    else:
+        user_ids = [i["from_id"] for i in messages]
+        await asyncio.sleep(0)  # заставляем роботать другие процессы
+        users = await get_avatars_and_names(ctx, user_ids)
+        file = await make_alternate_quote(users, messages)
+        if not file:
+            await ctx.reply("Текста не найдено")
+            return
+        attach = Attachment.new(file)
+        attachment = await ctx.backend.upload_attachment(
+            attach, peer_id=msg.receiver_id)
         message = ""
         await ctx.reply(message, attachments=attachment)
