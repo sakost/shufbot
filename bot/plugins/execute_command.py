@@ -23,6 +23,7 @@ async def _(msg, ctx):
     except Exception as e:
         await ctx.reply(f"Error occurred:\n{''.join(traceback.format_exception_only(*sys.exc_info()[:2]))}")
     finally:
-        output.seek(0)
-        await ctx.reply(f"Command output:\n{output.read()}")
+        out_text = output.getvalue()
+        if out_text:
+            await ctx.reply(f"Command output:\n{}")
         output.close()
