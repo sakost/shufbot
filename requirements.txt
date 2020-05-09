@@ -8,4 +8,4 @@ aiomysql
 aiojobs
 aiohttp
 peewee-db-evolve
-pillow-simd
+pillow
