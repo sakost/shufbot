@@ -11,7 +11,7 @@ plugin = Plugin('Update bot[develop]')
 @plugin.on_commands(['упд', 'upd', 'обнови', 'update', 'upgrade'])
 @developer_global_role
 async def _(msg, ctx):
-    proc = await asyncio.create_subprocess_shell('git pull',
+    proc = await asyncio.create_subprocess_shell(f'git pull origin {ctx.app.config["git_branch"]}',
                                                  shell=True,
                                                  stdout=asyncio.subprocess.PIPE,
                                                  stderr=asyncio.subprocess.PIPE,
