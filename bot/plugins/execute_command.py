@@ -25,5 +25,5 @@ async def _(msg, ctx):
     finally:
         out_text = output.getvalue()
         if out_text:
-            await ctx.reply(f"Command output:\n{}")
+            await ctx.reply(f"Command output:\n{out_text}")
         output.close()
