@@ -24,7 +24,7 @@ def wrap(x, text, border, font, width=1000, max_width=1000, auto_expand=False):
         line_words = line + [word]
         new_line = ' '.join(line_words)
         size = font.getsize(new_line)
-        if x + size[0] <= width + border:
+        if x + size[0] <= (width + border):
             line.append(word)
         else:
             if size[0] > width and auto_expand:
@@ -130,6 +130,7 @@ def get_mono_quote(xy, actions, quote, draw,
                 draw.multiline_text((x, quote.height - size[1]), name,
                                     fg_rgb, name_font)
             x += 2
+            size = draw.multiline_textsize(name, name_font)
             y += size[1] + 42
         elif i["type"] == "message":
             size = draw.multiline_textsize(i["message"],
@@ -165,7 +166,7 @@ async def make_mono_quote(users, messages):
     quote = Image.open("assets/quotes.jpg").convert("RGB")
     actions, expanded, _ = await get_actions(
         users, messages, x, width, name_font, text_font,
-        -80, -(quote.width - 80), id)
+        -80, -(quote.width + 80), id)
     if not actions:
         return False
 
