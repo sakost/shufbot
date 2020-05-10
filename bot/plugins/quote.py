@@ -27,11 +27,11 @@ def wrap(x, text, border, font, width=1000, max_width=1000, auto_expand=False):
         if x + size[0] <= (width + border):
             line.append(word)
         else:
-            if size[0] > width and auto_expand:
-                if size[0] < max_width:
-                    width = size[0]
+            if x + size[0] > width and auto_expand:
+                if x + size[0] <= max_width:
+                    width = x + size[0]
                 else:
-                    width = 1000
+                    width = max_width
             if len(line_words) == 1:
                 tword = ""
                 n = 0
@@ -67,10 +67,10 @@ async def get_actions(users, messages, x, width, name_font,
     avatars = set()
     wrapped_names = dict()
     t_msg = list()
-    expanded = False
+    expanded = width
     if fixed_id:
         name, _expanded = wrap(
-            x, users[id]["name"], name_border, name_font, width)
+            x, users[id]["name"], name_border, name_font, expanded)
         wrapped_names.setdefault(id, name)
         actions.append({"avatar": users[id]["avatar"],
                         "name": name,
@@ -81,37 +81,31 @@ async def get_actions(users, messages, x, width, name_font,
         clean_msg = EMOJI_PATTERN.sub('', msg["text"])
         if clean_msg:
             if msg["from_id"] != id and not fixed_id:
-                wrapped_msg, _expanded = wrap(x, "\n".join(t_msg),
-                                              text_border, text_font,
-                                              width, max_width,
-                                              extend)
-                if _expanded:
-                    expanded = _expanded
                 if id != 0:
                     actions.append({"type": "message",
-                                    "message": "\n".join(wrap)})
+                                    "message": "\n".join(t_msg)})
                 id = msg["from_id"]
                 t_msg = list()
                 if wrapped_names.get(id):
                     name = wrapped_names[id]
                 else:
                     name, _expanded = wrap(
-                        x, users[id]["name"], name_border, name_font, width)
+                        x, users[id]["name"], name_border, name_font, expanded)
                     wrapped_names.setdefault(id, name)
                 actions.append({"avatar": users[id]["avatar"],
                                 "name": name,
                                 "type": "title"})
                 avatars.add(users[id]["avatar"]["photo_100"])
+            wrapped_msg, _expanded = wrap(x, msg["text"],
+                                          text_border, text_font,
+                                          width, max_width,
+                                          extend)
+            if _expanded > expanded:
+                expanded = _expanded
+            t_msg.append(wrapped_msg)
 
-            t_msg.append(msg["text"])
-
-    wrapped_msg, _expanded = wrap(x, "\n".join(t_msg),
-                                  text_border, text_font,
-                                  width, max_width, extend)
-    if _expanded:
-        expanded = _expanded
     actions.append({"type": "message",
-                    "message": wrapped_msg})
+                    "message": "\n".join(t_msg)})
     if not actions:
         return False
     return actions, expanded, avatars
@@ -191,6 +185,46 @@ async def make_mono_quote(users, messages):
     return file
 
 
+def get_alternate_quote(xy, actions, avatars, draw, img,
+                        fg_rgb, n_rgb, name_font, text_font,
+                        line_indent, real_draw=True):
+    x, y = xy
+    if real_draw:
+        mask = Image.open(open("assets/mask.png", "rb")).convert("RGBA")
+    previous = "start"
+    for i in actions:
+        if i.get("type") == "title":
+            x = 40
+            if previous == "title":
+                y += 40
+            elif previous != "start":
+                y += 20
+            if real_draw:
+                ava = Image.open(BytesIO(avatars[i["avatar"]["photo_100"]]))
+                img.paste(ava, (x, y))
+                img.alpha_composite(mask, (x, y))
+            x += 100 + 25  # ava.width + 25
+            y += 7
+            size = draw.multiline_textsize(i["name"], name_font)
+            if real_draw:
+                draw.multiline_text(
+                    (x, y), i["name"], font=name_font, fill=n_rgb)
+            y += size[1] + 12
+            previous = "title"
+        elif i.get("type") == "message":
+            x = 40 + 100 + 25
+            size = draw.multiline_textsize(i["message"], font=text_font,
+                                           spacing=line_indent)
+            if real_draw:
+                draw.multiline_text((x, y), i["message"],
+                                    font=text_font, fill=fg_rgb,
+                                    spacing=line_indent)
+            y += size[1]
+            previous = "message"
+    y += 40
+    return y
+
+
 async def make_alternate_quote(users, messages):
     name_font = ImageFont.truetype("assets/Roboto-Bold.ttf",
                                    size=34,
@@ -202,39 +236,9 @@ async def make_alternate_quote(users, messages):
     line_indent = 12
     x = 40 + 100 + 26
     y = 40
-
-    actions = list()
-    id = 0
-    expanded = False
-    avatars = set()
-    wrapped_names = dict()
-    t_msg = list()
-    for msg in messages:
-        t = EMOJI_PATTERN.sub('', msg["text"])
-        if t:
-            if msg["from_id"] != id:
-                if id != 0:
-                    actions.append({"type": "message",
-                                    "message": "\n".join(t_msg)})
-                t_msg = list()
-                id = msg["from_id"]
-                if wrapped_names.get(id):
-                    name = wrapped_names[id]
-                else:
-                    name, _ = wrap(
-                        x, users[id]["name"], -40, name_font)
-                    wrapped_names.setdefault(id, name)
-                actions.append({"avatar": users[id]["avatar"],
-                                "name": name,
-                                "type": "title"})
-                avatars.add(users[id]["avatar"]["photo_100"])
-            t, _expanded = wrap(x, msg["text"], -40, text_font)
-            if _expanded:
-                expanded = _expanded
-            t_msg.append(t)
-
-    actions.append({"type": "message",
-                    "message": "\n".join(t_msg)})
+    actions, expanded, avatars = await get_actions(
+        users, messages, x, width, name_font, text_font,
+        -40, -40, extend=True, max_width=1000)
     if not actions:
         return False
 
@@ -246,34 +250,19 @@ async def make_alternate_quote(users, messages):
     fg_rgb = ImageColor.getrgb("#000000")
     n_rgb = ImageColor.getrgb("#466383")
 
-    img = Image.new("RGBA", (width, 1000), bg_rgb)
+    img = Image.new("RGBA", (width, 1000), bg_rgb)  # temp image
     draw = ImageDraw.Draw(img)
-    x = 40
-    start = True
-    for i in actions:
-        if i.get("type") == "title":
-            x = 40
-            if not start:
-                y += 20
-            else:
-                start = False
-            ava = Image.open(BytesIO(avatars[i["avatar"]["photo_100"]]))
-            mask = Image.open(open("assets/mask.png", "rb")).convert("RGBA")
-            img.paste(ava, (x, y))
-            img.alpha_composite(mask, (x, y))
-            x += ava.width + 25
-            y += 7
-            size = draw.multiline_textsize(i["name"], name_font)
-            draw.multiline_text((x, y), i["name"], font=name_font, fill=n_rgb)
-            y += size[1] + 12
-        elif i.get("type") == "message":
-            x = 40 + 100 + 25
-            size = draw.multiline_textsize(i["message"], font=text_font,
-                                           spacing=line_indent)
-            draw.multiline_text((x, y), i["message"],
-                                font=text_font, fill=fg_rgb,
-                                spacing=line_indent)
-            y += size[1]
+
+    height = get_alternate_quote((x, y), actions, avatars, draw, img, fg_rgb,
+                                 n_rgb, name_font, text_font, line_indent,
+                                 False)
+
+    img = Image.new("RGBA", (width, height), bg_rgb)
+    draw = ImageDraw.Draw(img)
+
+    get_alternate_quote((x, y), actions, avatars, draw, img, fg_rgb,
+                        n_rgb, name_font, text_font, line_indent)
+    draw = ImageDraw.Draw(img)
     file = BytesIO()
     img.save(file, "PNG")
     file.seek(0)
