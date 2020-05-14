@@ -32,7 +32,7 @@ def main():
     app.add_backend(backend)
     app.config['settings'] = SHUF_SETTINGS
     app.config['chat_prefixes'] = ('еш ', 'есб ', 'esb ', 'ешаф ', 'eshuf ')  # ('шаф ', 'sb ', 'шб ', 'shuf ', 'shufbot ')
-    app.config['prefixes'] = ('',)  # clean default settings (monkey patch)
+    app.config['prefixes'] = ()  # clean default settings (monkey patch)
     app.config['inform_time'] = time(20, 50)  # 12:00
     app.config['votekick_time'] = 5 * 60
     app.config['git_branch'] = 'develop'
