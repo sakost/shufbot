@@ -25,7 +25,7 @@ async def _(app: Kutana):
             # order is important
             await init_scheduler(app)
             break
-    app.config['re_chat_prefixes'] = re.compile(rf'^({"|".join(map(re.escape, app.config["chat_prefixes"]))})(.*)$',
+    app.config['re_chat_prefixes'] = re.compile(rf'^({"|".join(map(re.escape, app.config["chat_prefixes"]))})\s*?(.*)$',
                                                 re.IGNORECASE | re.UNICODE)
 
 
