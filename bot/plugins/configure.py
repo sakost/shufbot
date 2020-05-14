@@ -1,3 +1,5 @@
+import re
+
 from kutana import Plugin, Kutana, Update, UpdateType, Context
 from kutana.update import ReceiverType
 from peewee_async import Manager
@@ -23,17 +25,29 @@ async def _(app: Kutana):
             # order is important
             await init_scheduler(app)
             break
+    app.config['re_chat_prefixes'] = re.compile(rf'^({"|".join(map(re.escape, app.config["chat_prefixes"]))})(.*)$',
+                                                re.IGNORECASE | re.UNICODE)
 
 
 @plugin.on_before()
 async def _(upd: Update, ctx: Context):
     if upd.type == UpdateType.MSG:
-        user_id = upd.raw['object']['message']['from_id']
+        message = upd.raw['object']['message']
+        user_id = message['from_id']
         ctx.mgr: Manager = ctx.config['db_manager']
+
+        # define shortcuts to chat and user
         ctx.user, created = await ctx.mgr.get_or_create(User, id=user_id)
+        ctx.is_chat = False
         if upd.receiver_type == ReceiverType.MULTI:
             ctx.chat, chat_created = await ctx.mgr.get_or_create(Chat, id=upd.receiver_id - 2*10**9)
             ctx.chat_user, chat_user_created = await ctx.mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
+            ctx.is_chat = True
+        # check prefixes
+        ctx.with_prefix = False
+        if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
+            message['text'] = match.group(2)
+            ctx.with_prefix = True
 
 
 @plugin.on_shutdown()
