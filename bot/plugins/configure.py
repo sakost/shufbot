@@ -54,7 +54,9 @@ async def _(upd, ctx):
             message['text'] = match.group(2)
             ctx.with_prefix = True
         elif ctx.is_chat and ctx.chat.mention:
+            print('pidor net')
             return
+    print('pidor da')
     return HandlerResponse.SKIPPED
 
 
