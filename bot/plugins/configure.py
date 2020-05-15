@@ -50,7 +50,7 @@ async def _(msg, ctx):
     ctx.with_prefix = False
     message = msg.raw['object']['message']
     if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
-        message.text = message['text'] = match.group(2)
+        msg.text = message['text'] = match.group(2)
         ctx.with_prefix = True
     elif ctx.is_chat and ctx.chat.mention:
         print('pidor net')
