@@ -45,17 +45,16 @@ async def _(upd: Update, ctx: Context):
             ctx.is_chat = True
 
 
-@plugin.on_any_update(router_priority=50)
-async def _(upd, ctx):
-    if upd.type == UpdateType.MSG:
-        ctx.with_prefix = False
-        message = upd.raw['object']['message']
-        if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
-            message['text'] = match.group(2)
-            ctx.with_prefix = True
-        elif ctx.is_chat and ctx.chat.mention:
-            print('pidor net')
-            return
+@plugin.on_any_message(priority=50, router_priority=50)
+async def _(msg, ctx):
+    ctx.with_prefix = False
+    message = msg.raw['object']['message']
+    if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
+        message['text'] = match.group(2)
+        ctx.with_prefix = True
+    elif ctx.is_chat and ctx.chat.mention:
+        print('pidor net')
+        return
     print('pidor da')
     return HandlerResponse.SKIPPED
 
