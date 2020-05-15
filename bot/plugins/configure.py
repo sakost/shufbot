@@ -55,7 +55,7 @@ async def _(msg, ctx):
     elif ctx.is_chat and ctx.chat.mention:
         print('pidor net')
         return
-    print('pidor da')
+    print('pidor da', message['text'])
     return HandlerResponse.SKIPPED
 
 
