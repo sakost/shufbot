@@ -45,7 +45,7 @@ async def _(upd: Update, ctx: Context):
             ctx.is_chat = True
 
 
-@plugin.on_any_update(priority=50)
+@plugin.on_any_update(router_priority=50)
 async def _(upd, ctx):
     if upd.type == UpdateType.MSG:
         ctx.with_prefix = False
