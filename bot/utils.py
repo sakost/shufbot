@@ -1,5 +1,6 @@
-import asyncio
 import re
+
+import asyncio
 import aiohttp
 
 EXTRACT_USERS_MENTIONED = re.compile(r'\[id(\d*?)\|.*?\]', re.DOTALL)

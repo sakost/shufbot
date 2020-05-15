@@ -1,6 +1,6 @@
 import re
 
-from kutana import Plugin, Kutana, Update, UpdateType, Context
+from kutana import Plugin, Kutana, Update, UpdateType, Context, HandlerResponse
 from kutana.update import ReceiverType
 from peewee_async import Manager
 
@@ -43,11 +43,19 @@ async def _(upd: Update, ctx: Context):
             ctx.chat, chat_created = await ctx.mgr.get_or_create(Chat, id=upd.receiver_id - 2*10**9)
             ctx.chat_user, chat_user_created = await ctx.mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
             ctx.is_chat = True
-        # check prefixes
+
+
+@plugin.on_any_update(priority=50)
+async def _(upd, ctx):
+    if upd.type == UpdateType.MSG:
         ctx.with_prefix = False
+        message = upd.raw['object']['message']
         if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
             message['text'] = match.group(2)
             ctx.with_prefix = True
+        elif ctx.is_chat and ctx.chat.mention:
+            return
+    return HandlerResponse.SKIPPED
 
 
 @plugin.on_shutdown()
