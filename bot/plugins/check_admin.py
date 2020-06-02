@@ -1,6 +1,6 @@
-from kutana import Plugin, Context
-from kutana.exceptions import RequestException
+from kutana import Context
 
+from bot.plugin import CustomPlugin as Plugin
 from bot.roles import chat_only
 
 plugin = Plugin('Check admin rights', 'Проверяет, есть ли права Администратора у бота')

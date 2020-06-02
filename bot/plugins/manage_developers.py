@@ -1,6 +1,6 @@
-from kutana import Plugin
 from peewee_async import Manager
 
+from bot.plugin import CustomPlugin as Plugin
 from bot.db import User
 from bot.roles import owner_global_role, UserRoles
 from bot.utils import extract_users

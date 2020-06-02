@@ -1,7 +1,6 @@
 import asyncio
 
-from kutana import Plugin
-
+from bot.plugin import CustomPlugin as Plugin
 from bot.plugins.restart import restart_command
 from bot.roles import developer_global_role
 

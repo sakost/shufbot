@@ -1,14 +1,15 @@
 import re
 
-from kutana import Plugin, Kutana, Update, UpdateType, Context, HandlerResponse
+from kutana import Kutana, Update, UpdateType, Context, HandlerResponse
 from kutana.update import ReceiverType
 from peewee_async import Manager
 
+from bot.plugin import CustomPlugin
 from bot.db import ChatUser, User, Chat
 from bot.scheduler import init_scheduler
 from bot.roles import ChatRoles
 
-plugin = Plugin('Configure[system]')
+plugin = CustomPlugin('Configure[system]')
 
 
 async def init_db(app: Kutana):
@@ -44,19 +45,21 @@ async def _(upd: Update, ctx: Context):
             ctx.chat_user, chat_user_created = await ctx.mgr.get_or_create(ChatUser, user=ctx.user, chat=ctx.chat)
             ctx.is_chat = True
 
+        ctx.with_prefix = False
+        message = upd.raw['object']['message']
+        if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
+            ctx.update = upd._replace(text=match.group(2))
+            ctx.with_prefix = True
 
-@plugin.on_any_message(priority=50, router_priority=50)
-async def _(msg, ctx):
-    ctx.with_prefix = False
-    message = msg.raw['object']['message']
-    if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
-        msg.text = message['text'] = match.group(2)
-        ctx.with_prefix = True
-    elif ctx.is_chat and ctx.chat.mention:
-        print('pidor net')
-        return
-    print('pidor da', message['text'])
-    return HandlerResponse.SKIPPED
+
+# @plugin.on_any_message()
+# async def _(upd, ctx):
+#    message = upd.raw['object']['message']
+#    if (match := ctx.app.config['re_chat_prefixes'].match(message.get('text', ''))) is not None:
+#        # ctx.update = upd._replace(text=match.group(2))
+#        ctx.with_prefix = True
+#    elif ctx.is_chat and ctx.chat.mention:
+#        return
 
 
 @plugin.on_shutdown()

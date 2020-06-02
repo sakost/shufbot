@@ -2,8 +2,9 @@ import os
 import sys
 import time
 
-from kutana import Plugin, Context
+from kutana import Context
 
+from bot.plugin import CustomPlugin as Plugin
 from bot.roles import developer_global_role
 from bot.utils import get_users
 

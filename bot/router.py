@@ -1,3 +1,4 @@
+from kutana import HandlerResponse
 from kutana.router import MapRouter
 from kutana.routers import AnyMessageRouter
 from kutana.update import UpdateType
@@ -6,6 +7,11 @@ from kutana.update import UpdateType
 class AnyMessageRouterCustom(AnyMessageRouter):
     def _check_update(self, update, ctx):
         return update.type == UpdateType.MSG
+
+    async def handle(self, update, ctx):
+        print(ctx.update)
+        await super().handle(ctx.update, ctx)
+        return HandlerResponse.SKIPPED
 
 
 class ActionMessageRouter(MapRouter):
@@ -26,3 +32,7 @@ class ActionMessageRouter(MapRouter):
         ctx.action_type = action['type']
         ctx.action = action
         return action['type'],
+
+    async def handle(self, update, ctx):
+        await super().handle(ctx.update, ctx)
+        return HandlerResponse.SKIPPED

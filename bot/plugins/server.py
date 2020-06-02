@@ -3,8 +3,8 @@ import time
 
 import aioping
 import psutil
-from kutana import Plugin
 
+from bot.plugin import CustomPlugin as Plugin
 from bot.roles import developer_global_role
 
 plugin = Plugin('Server[admin]', 'pings to servers')

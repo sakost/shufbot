@@ -1,4 +1,5 @@
-from kutana import Plugin, Context, Message
+from kutana import Context, Message
+from bot.plugin import CustomPlugin as Plugin
 
 plugin = Plugin(name='Аы', description='Напиши мне кто ты и я скажу кто ты')
 

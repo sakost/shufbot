@@ -3,10 +3,9 @@ import sys
 import traceback
 import contextlib
 
-from kutana import Plugin
 
 from bot.roles import developer_global_role
-
+from bot.plugin import CustomPlugin as Plugin
 plugin = Plugin('Execute[admin]', description='выполняет укаазанную команду')
 
 

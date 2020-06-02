@@ -1,7 +1,6 @@
 import asyncio
 
-from kutana import Plugin
-
+from bot.plugin import CustomPlugin as Plugin
 from bot.db import User, ChatUser
 from bot.roles import chat_only, needed_admin_rights, ChatUserRoles, creator_role
 

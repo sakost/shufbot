@@ -1,5 +1,4 @@
-from kutana import Plugin
-
+from bot.plugin import CustomPlugin as Plugin
 from bot.db import ChatUser, User
 from bot.roles import admin_role, ChatUserRoles, chat_only, UserRoles
 from bot.utils import extract_users

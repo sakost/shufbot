@@ -1,5 +1,4 @@
-from kutana import Plugin
-
+from bot.plugin import CustomPlugin as Plugin
 from bot.roles import developer_global_role, ChatRoles, chat_only
 
 plugin = Plugin('Manage chats[develop]', 'Manage chats roles')

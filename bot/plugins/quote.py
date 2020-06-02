@@ -1,5 +1,6 @@
-from kutana import Plugin, Attachment
+from kutana import Attachment
 
+from bot.plugin import CustomPlugin as Plugin
 from bot.utils import get_avatars_and_names, extract_messages, download_images
 from PIL import Image, ImageColor, ImageDraw, ImageFont
 from io import BytesIO

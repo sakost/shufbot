@@ -1,8 +1,7 @@
-from kutana import Plugin
-
 from bot.db import ChatUser, User
 from bot.roles import admin_role, needed_admin_rights, chat_only
 from bot.utils import extract_users
+from bot.plugin import CustomPlugin as Plugin
 
 plugin = Plugin('Kick', 'кикает пользователя из беседы')
 
